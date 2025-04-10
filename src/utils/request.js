@@ -1,0 +1,89 @@
+import axios from 'axios'
+import CryptoJS from 'crypto-js';
+import { useCommonStore } from '@/stores/commonStore';
+
+export const baseURL = 'https://jocy-api.6b7.xyz/app/';
+
+// 创建axios实例
+const instance = axios.create({
+    baseURL,
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+// 请求拦截器
+instance.interceptors.request.use(
+    (config) => {
+        // 尝试获取pinia store
+        try {
+            const commonStore = useCommonStore();
+            const token = commonStore.token;
+            
+            // 如果有token则添加到请求头
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+        } catch (error) {
+            console.error('获取store失败:', error);
+        }
+        
+        // 填充签名
+        let { signature, timestamp } = generateSignature();
+        config.headers['s'] = signature;
+        config.headers['t'] = timestamp;
+        
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// 响应拦截器
+instance.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        // 处理401未授权的情况
+        if (error.response && error.response.status === 401) {
+            try {
+                const commonStore = useCommonStore();
+                commonStore.clearToken();
+                commonStore.setLoginState(false);
+                
+                // 弹出登录框
+                commonStore.setIsShowLoginModal(true);
+            } catch (error) {
+                console.error('获取store失败:', error);
+            }
+        }
+        
+        return Promise.reject(error);
+    }
+);
+
+// 生成签名的函数
+export function generateSignature() {
+    const jocy = 'jocy';
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const randomStr = Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const reversedRandomStr = randomStr.split('').reverse().join('');
+
+    // 拼接字符串
+    const signData = `${jocy}&${timestamp}&${randomStr}`;
+    const md5Hash = CryptoJS.MD5(signData).toString();
+
+    // 最终签名
+    const signature = `${md5Hash}.${reversedRandomStr}`;
+
+    return {
+        signature,
+        timestamp,
+    };
+}
+
+export default instance;

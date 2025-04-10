@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -13,6 +13,98 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* 全局颜色变量 */
+:root {
+  --color-primary: #f596aa;
+  --color-secondary: #f28b82;
+  --color-text: #333;
+  --color-text-light: #666;
+  --color-text-lighter: #999;
+  --color-bg: #f7f8f9;
+  --color-border: #eaebec;
+}
+
+/* 常用布局类 */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-base {
+  flex: 1;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.align-items {
+  justify-content: center;
+  align-items: center;
+}
+
+.content-between {
+  justify-content: space-between;
+}
+
+/* 实用工具类 */
+.p-pointer {
+  cursor: pointer;
+}
+
+.theme-color {
+  color: var(--color-primary);
+}
+
+.theme-button-bg {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.theme-button-bg:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-icon {
+  color: var(--color-primary);
+}
+
+.view-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* 动画效果 */
+.flash-view {
+  transition: all 0.3s ease;
+}
+
+.flash-view:hover {
+  transform: translateY(-2px);
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -20,14 +112,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
