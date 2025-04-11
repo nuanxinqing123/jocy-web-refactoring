@@ -186,6 +186,7 @@ const handleCollect = async () => {
 
             .title {
                 text-align: center;
+                color: #666666;
 
                 h1 {
                     font-size: 20px;
@@ -235,6 +236,7 @@ const handleCollect = async () => {
 
     .title {
         margin-bottom: 16px;
+        color: #666666;
 
         h1 {
             font-size: 24px;

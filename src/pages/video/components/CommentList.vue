@@ -316,6 +316,10 @@ onBeforeUnmount(() => {
       .nav-title {
         font-size: 18px;
         font-weight: bold;
+
+        .nav-title-text {
+          color: #666666;
+        }
         
         .total-comment {
           margin-left: 8px;

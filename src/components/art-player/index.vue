@@ -37,6 +37,9 @@ let art = null;
 let secondCounter = ref(0);
 let currentPlayTime = ref(0);
 let timeInterval = null;
+let lastLoadTime = 0;
+let loadingDanmuku = false;
+let loadedTimeRanges = [];
 
 // 获取弹幕数据
 const getDanmuData = async (startTime, endTime) => {
@@ -108,6 +111,96 @@ function playM3u8(video, url, art) {
         art.notice.show = 'Unsupported playback format: m3u8';
     }
 }
+
+// 加载弹幕函数
+const loadDanmuku = async (startTime, endTime) => {
+  try {
+    // 避免小于0的时间
+    startTime = Math.max(0, startTime);
+    
+    // 将时间转换为毫秒
+    const start = Math.floor(startTime * 1000);
+    const end = Math.floor(endTime * 1000);
+    
+    // 检查此时间段是否已加载过
+    const alreadyLoaded = loadedTimeRanges.some(range => 
+      (start >= range.start && start <= range.end) && 
+      (end >= range.start && end <= range.end)
+    );
+    
+    // 如果已经在加载或者这个时间段已经加载过，则跳过
+    if (loadingDanmuku || alreadyLoaded) return;
+    
+    loadingDanmuku = true;
+
+    // 获取弹幕数据
+    const danmuList = await getDanmuData(start, end);
+
+    // 添加弹幕到播放器[循环添加]
+    if (art && art.plugins.artplayerPluginDanmuku) {
+      danmuList.forEach(danmu => {
+        art.plugins.artplayerPluginDanmuku.emit(danmu);
+      });
+    }
+    
+    // 记录已加载的时间范围
+    loadedTimeRanges.push({ start, end });
+    
+    // 只保留最近10个时间范围记录，避免数组过长
+    if (loadedTimeRanges.length > 10) {
+      loadedTimeRanges.shift();
+    }
+    
+    loadingDanmuku = false;
+  } catch (error) {
+    console.error('加载弹幕失败:', error);
+    loadingDanmuku = false;
+  }
+};
+
+// 重置弹幕加载机制
+const resetDanmuku = () => {
+  if (!art) return;
+  
+  // 清空已加载的时间范围记录
+  loadedTimeRanges = [];
+  
+  // 加载初始弹幕
+  loadDanmuku(0, 60);
+  
+  // 移除旧的事件监听
+  art.off('timeupdate');
+  art.off('seeked');
+  
+  // 重置时间点
+  lastLoadTime = 0;
+  
+  // 添加新的timeupdate事件
+  art.on('timeupdate', () => {
+    const currentTime = art.currentTime;
+    // 每隔20秒加载一次弹幕
+    if (currentTime - lastLoadTime >= 20) {
+      loadDanmuku(currentTime, currentTime + 60);
+      lastLoadTime = currentTime;
+    }
+  });
+  
+  // 添加seeked事件处理，用户拖动进度条后触发
+  art.on('seeked', () => {
+    const currentTime = art.currentTime;
+    // 判断跳转距离
+    const timeDiff = Math.abs(currentTime - lastLoadTime);
+    
+    // 如果跳转距离超过60秒，清空已加载记录，以便重新加载
+    if (timeDiff > 60) {
+      loadedTimeRanges = [];
+    }
+    
+    // 拖动后立即加载当前位置的弹幕
+    loadDanmuku(currentTime, currentTime + 60);
+    lastLoadTime = currentTime;
+  });
+};
 
 // 初始化播放器
 const initPlayer = () => {
@@ -205,6 +298,9 @@ const initPlayer = () => {
   // 创建播放器实例
   art = new Artplayer(options);
 
+  // 重置弹幕加载机制
+  resetDanmuku();
+
   // 监听播放器事件
   art.on('ready', () => {
     if (startTime > 0) {
@@ -218,44 +314,18 @@ const initPlayer = () => {
       part: props.part,
       time_point: 0
     }).catch(err => console.error('初始播放记录保存失败', err));
-
-    // 初始加载弹幕
-    loadDanmuku(0, 60);
   });
-
-  // 动态加载弹幕
-  let lastLoadTime = 0;
-  art.on('timeupdate', () => {
-    const currentTime = art.currentTime;
-    // 每隔30秒加载一次弹幕
-    if (currentTime - lastLoadTime >= 30) {
-      loadDanmuku(currentTime, currentTime + 60);
-      lastLoadTime = currentTime;
-    }
-  });
-
-  // 加载弹幕函数
-  const loadDanmuku = async (startTime, endTime) => {
-    try {
-      // 将时间转换为毫秒
-      const start = Math.floor(startTime * 1000);
-      const end = Math.floor(endTime * 1000);
-
-      // 获取弹幕数据
-      const danmuList = await getDanmuData(start, end);
-
-      // 添加弹幕到播放器[循环添加]
-      danmuList.forEach(danmu => {
-        art.plugins.artplayerPluginDanmuku.emit(danmu);
-      });
-    } catch (error) {
-      console.error('加载弹幕失败:', error);
-    }
-  };
 
   // 监听播放状态
   art.on('play', () => {
     startTimeTracking();
+    
+    // 播放时检查当前位置的弹幕是否需要加载
+    const currentTime = art.currentTime;
+    if (currentTime - lastLoadTime >= 10) {
+      loadDanmuku(currentTime, currentTime + 60);
+      lastLoadTime = currentTime;
+    }
   });
 
   art.on('pause', () => {
@@ -272,6 +342,22 @@ const initPlayer = () => {
   // 监听错误
   art.on('error', (error) => {
     console.error('播放器错误:', error);
+  });
+  
+  // 监听播放速率变化
+  art.on('playbackRate', () => {
+    const currentTime = art.currentTime;
+    loadDanmuku(currentTime, currentTime + 60);
+    lastLoadTime = currentTime;
+  });
+  
+  // 监听视频跳转
+  art.on('seek', () => {
+    const currentTime = art.currentTime;
+    if (Math.abs(currentTime - lastLoadTime) > 5) {
+      loadDanmuku(currentTime, currentTime + 60);
+      lastLoadTime = currentTime;
+    }
   });
 };
 
@@ -364,6 +450,9 @@ watch([() => props.part, () => props.playType, () => props.url], () => {
   if (art && props.url) {
     art.switchUrl(props.url);
     clearTimeTracking();
+    
+    // 重置弹幕加载机制
+    resetDanmuku();
   } else {
     initPlayer();
   }

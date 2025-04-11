@@ -288,6 +288,7 @@ defineExpose({
             font-weight: 600;
             margin-bottom: 5px;
             cursor: pointer;
+            color: #666666;
 
             &:hover {
                 color: var(--color-primary);
