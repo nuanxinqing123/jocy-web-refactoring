@@ -9,6 +9,7 @@ import artplayerPluginDanmuku from 'artplayer-plugin-danmuku';
 import { postHistoryAPI } from '@/api/video';
 import { getDanmuAPI } from '@/api/video';
 import { useCommonStore } from '@/stores/commonStore';
+import Hls from 'hls.js';
 
 const props = defineProps({
   videoId: {
@@ -92,6 +93,22 @@ const formatColor = (colorValue) => {
   return '#' + (colorValue & 0xFFFFFF).toString(16).padStart(6, '0');
 };
 
+// 播放m3u8
+function playM3u8(video, url, art) {
+    if (Hls.isSupported()) {
+        if (art.hls) art.hls.destroy();
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        art.hls = hls;
+        art.on('destroy', () => hls.destroy());
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+    } else {
+        art.notice.show = 'Unsupported playback format: m3u8';
+    }
+}
+
 // 初始化播放器
 const initPlayer = () => {
   // 销毁旧的播放器实例
@@ -163,9 +180,16 @@ const initPlayer = () => {
       loading: '<img src="https://artplayer.org/assets/img/ploading.gif" alt="loading">',
       state: '<img width="150" height="150" src="https://artplayer.org/assets/img/state.svg" alt="state">',
     },
-    customType: {},
+    customType: {
+      m3u8: playM3u8,
+    },
     plugins: [danmukuPlugin],
   };
+
+  // 判断URL中是否包含m3u8
+  if (props.url.includes('.m3u8')) {
+    options.type = 'm3u8';
+  }
 
   // 增加设置菜单项 - 弹幕控制
   options.settings = [

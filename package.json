@@ -13,6 +13,7 @@
     "artplayer-plugin-danmuku": "^5.1.5",
     "axios": "^1.8.4",
     "crypto-js": "^4.2.0",
+    "hls.js": "^1.6.2",
     "less": "^4.3.0",
     "pinia": "^3.0.2",
     "query-string": "^9.1.1",

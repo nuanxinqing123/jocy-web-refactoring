@@ -68,6 +68,7 @@ const getVideoUrl = async () => {
     } else {
       url = res.data.url.single;
     }
+    
 
     // 处理m3u8格式
     if (url.toString().includes(".m3u8")) {
