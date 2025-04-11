@@ -250,6 +250,11 @@ arrify@^2.0.1:
   resolved "https://registry.npmjs.org/arrify/-/arrify-2.0.1.tgz"
   integrity sha512-3duEwti880xqi4eAMN8AyR4a0ByT90zoYdLlevfrvU43vb0YZwZVfxOgxWrLXXXpyugL0hNZc9G6BiB5B3nUug==
 
+artplayer-plugin-danmuku@^5.1.5:
+  version "5.1.5"
+  resolved "https://registry.npmjs.org/artplayer-plugin-danmuku/-/artplayer-plugin-danmuku-5.1.5.tgz"
+  integrity sha512-iFjdXVbkw5FbkB98SOwMPQEFJp7k6Io4nHfehpSdCc7Eo1gkmjNShOT6dAtAH1kLMHjh38vRnf/oYwCvTKkVOw==
+
 artplayer@^5.2.2:
   version "5.2.2"
   resolved "https://registry.npmjs.org/artplayer/-/artplayer-5.2.2.tgz"

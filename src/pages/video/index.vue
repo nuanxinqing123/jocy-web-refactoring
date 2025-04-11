@@ -222,6 +222,11 @@ onMounted(() => {
         border-radius: 12px;
         overflow: hidden;
         aspect-ratio: 16/9;
+        transform: translateZ(0);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        will-change: transform;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 
         .player-placeholder {
             width: 100%;

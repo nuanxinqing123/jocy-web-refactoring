@@ -11,6 +11,9 @@ export const useCommonStore = defineStore('common', () => {
     const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'));
     const isShowLoginModal = ref(false);
     
+    // 播放历史记录
+    const historyList = ref(JSON.parse(localStorage.getItem('historyList') || '[]'));
+    
     // 设置移动端状态
     const setIsMobile = (value) => {
         isMobile.value = value;
@@ -59,12 +62,19 @@ export const useCommonStore = defineStore('common', () => {
         isShowLoginModal.value = value;
     };
     
+    // 更新播放历史记录
+    const updateHistoryList = (list) => {
+        historyList.value = list;
+        localStorage.setItem('historyList', JSON.stringify(list));
+    };
+    
     return {
         isMobile,
         token,
         isLogin,
         userInfo,
         isShowLoginModal,
+        historyList,
         checkIsMobile,
         setIsMobile,
         setToken,
@@ -72,5 +82,6 @@ export const useCommonStore = defineStore('common', () => {
         setLoginState,
         setUserInfo,
         setIsShowLoginModal,
+        updateHistoryList,
     };
 }); 

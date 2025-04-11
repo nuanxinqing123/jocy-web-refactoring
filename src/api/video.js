@@ -52,6 +52,11 @@ export function getDanmuAPI(params) {
     })
 }
 
+// 发送弹幕
+export function postDanmuAPI(data) {
+    return request.post(`danmu`, data)
+}
+
 // 获取播放资源
 export function postPlayResourcesAPI(url) {
     return request.post('play/resources', { url })
