@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import './style.css'
 import '@arco-design/web-vue/dist/arco.css';
 import './assets/style/main.less'
@@ -13,47 +13,47 @@ const pinia = createPinia()
 
 // 创建路由实例
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
-    { 
-      path: '/', 
+    {
+      path: '/',
       name: 'home',
-      component: () => import('./pages/Home.vue') 
+      component: () => import('./pages/Home.vue')
     },
-    { 
-      path: '/library', 
+    {
+      path: '/library',
       name: 'library',
-      component: () => import('./pages/Library.vue') 
+      component: () => import('./pages/Library.vue')
     },
-    { 
-      path: '/collect', 
+    {
+      path: '/collect',
       name: 'collect',
-      component: () => import('./pages/Collect.vue') 
+      component: () => import('./pages/Collect.vue')
     },
-    { 
-      path: '/historical', 
+    {
+      path: '/historical',
       name: 'historical',
-      component: () => import('./pages/Historical.vue') 
+      component: () => import('./pages/Historical.vue')
     },
-    { 
-      path: '/search', 
+    {
+      path: '/search',
       name: 'search',
-      component: () => import('./pages/Search.vue') 
+      component: () => import('./pages/Search.vue')
     },
-    { 
-      path: '/detail/:id', 
+    {
+      path: '/detail/:id',
       name: 'detail',
-      component: () => import('./pages/detail/index.vue') 
+      component: () => import('./pages/detail/index.vue')
     },
-    { 
-      path: '/video/:id', 
+    {
+      path: '/video/:id',
       name: 'video',
-      component: () => import('./pages/video/index.vue') 
+      component: () => import('./pages/video/index.vue')
     },
-    { 
-      path: '/:pathMatch(.*)*', 
+    {
+      path: '/:pathMatch(.*)*',
       name: 'notFound',
-      component: () => import('./pages/NotFound.vue') 
+      component: () => import('./pages/NotFound.vue')
     }
   ]
 })
