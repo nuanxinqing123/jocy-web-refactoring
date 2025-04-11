@@ -19,6 +19,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getVideoPlayAPI, postPlayResourcesAPI } from "@/api/video";
 import ArtPlayer from '@/components/art-player/index.vue';
+import { useCommonStore } from '@/stores/commonStore';
 
 const props = defineProps({
   videoId: {
@@ -45,6 +46,13 @@ const getVideoUrl = async () => {
   try {
     // 重置播放地址
     playerUrl.value = '';
+
+    // 此处判断是否登录, 需要强制登录
+    const commonStore = useCommonStore();
+    if (!commonStore.isLogin) {
+      commonStore.setIsShowLoginModal(true);
+      return;
+    }
 
     // 获取播放地址
     const res = await getVideoPlayAPI({

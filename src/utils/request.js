@@ -44,6 +44,14 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
     (response) => {
+        // 判断 code 是否为 50014, 代表Token已失效, 需要强制登录
+        if (response.data.code === 50014) {
+            const commonStore = useCommonStore();
+            commonStore.clearToken();
+            commonStore.setLoginState(false);
+            commonStore.setIsShowLoginModal(true);
+        }
+
         return response;
     },
     (error) => {
