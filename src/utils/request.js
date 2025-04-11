@@ -20,20 +20,20 @@ instance.interceptors.request.use(
         try {
             const commonStore = useCommonStore();
             const token = commonStore.token;
-            
+
             // 如果有token则添加到请求头
             if (token) {
-                config.headers['Authorization'] = `Bearer ${token}`;
+                config.headers['x-token'] = token;
             }
         } catch (error) {
             console.error('获取store失败:', error);
         }
-        
+
         // 填充签名
         let { signature, timestamp } = generateSignature();
         config.headers['s'] = signature;
         config.headers['t'] = timestamp;
-        
+
         return config;
     },
     (error) => {
@@ -53,14 +53,14 @@ instance.interceptors.response.use(
                 const commonStore = useCommonStore();
                 commonStore.clearToken();
                 commonStore.setLoginState(false);
-                
+
                 // 弹出登录框
                 commonStore.setIsShowLoginModal(true);
             } catch (error) {
                 console.error('获取store失败:', error);
             }
         }
-        
+
         return Promise.reject(error);
     }
 );
@@ -86,4 +86,6 @@ export function generateSignature() {
     };
 }
 
+// 同时提供默认导出和命名导出
+export const request = instance;
 export default instance;

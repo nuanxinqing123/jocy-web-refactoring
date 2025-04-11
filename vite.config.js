@@ -33,13 +33,6 @@ export default defineConfig({
         open: true,
         port: 3000,
         cors: true,
-        proxy: {
-            '/api': {
-                target: 'https://api.example.com', // 替换为实际的API地址
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, '')
-            }
-        }
     },
     define: {
         'process.env': {

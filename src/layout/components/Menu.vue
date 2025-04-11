@@ -3,7 +3,7 @@
         <div class="menu-logo flex align-items" :class="activeIndex === 0 ? 'menu-top-radius' : ''">
             <img src="@/assets/image/logo.jpg" class="menu-logo-img" />
         </div>
-        <div class="menu-item flex align-center" v-for="(item, index) in menus" :key="index" :class="[
+        <div class="menu-item flex align-center" v-for="(item, index) in filteredMenus" :key="index" :class="[
             activeIndex === index ? 'active' : '',
             activeIndex - 1 === index ? 'menu-top-radius' : '',
             activeIndex + 1 === index ? 'menu-bottom-radius' : '',
@@ -18,12 +18,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRoute, useRouter } from 'vue-router';
+import { useCommonStore } from '@/stores/commonStore';
 
 const route = useRoute();
 const router = useRouter();
+const commonStore = useCommonStore();
+const isLogin = ref(false);
 
+// 菜单项定义
 const menus = ref([
     {
         path: "/",
@@ -54,6 +58,7 @@ const menus = ref([
         meta: {
             locale: "收藏",
             icon: "icon-heart",
+            requiresLogin: true,
         },
     },
     {
@@ -62,6 +67,7 @@ const menus = ref([
         meta: {
             locale: "历史记录",
             icon: "icon-history",
+            requiresLogin: true,
         },
     },
     {
@@ -75,19 +81,49 @@ const menus = ref([
     },
 ]);
 
+// 过滤菜单项，根据登录状态
+const filteredMenus = computed(() => {
+    return menus.value.filter(menu => {
+        // 如果菜单项需要登录但用户未登录，则不显示该项
+        if (menu.meta.requiresLogin && !isLogin.value) {
+            return false;
+        }
+        return true;
+    });
+});
+
 const activeIndex = ref(0);
 
 // 根据当前路由设置活动菜单
 const setActiveMenu = () => {
     const currentPath = route.path;
-    menus.value.forEach((menu, index) => {
+    filteredMenus.value.forEach((menu, index) => {
         if (menu.path === currentPath) {
             activeIndex.value = index;
         }
     });
 };
 
+// 监听路由变化，更新选中的菜单项
+watch(
+    () => route.path,
+    () => {
+        setActiveMenu();
+    }
+);
+
 onMounted(() => {
+    // 初始化登录状态
+    isLogin.value = commonStore.isLogin;
+    
+    // 监听登录状态变化
+    watch(
+        () => commonStore.isLogin,
+        (newValue) => {
+            isLogin.value = newValue;
+        }
+    );
+    
     setActiveMenu();
 });
 

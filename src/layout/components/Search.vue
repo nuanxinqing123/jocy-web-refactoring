@@ -1,33 +1,41 @@
 <template>
     <div class="search-container flex align-center content-between">
         <a-input placeholder="搜索番剧" v-model="searchValue"
-            :class="isMobile ? 'flex-base search' : 'search navbar-search'" @input="searchChange"
-            @press-enter="searchInput" @blur="searchBlur" autocomplete="off">
+            :class="isMobile ? 'flex-base search' : 'search navbar-search'" 
+            @input="handleSearchInput"
+            @press-enter="handleSearch" 
+            @blur="searchBlur" 
+            autocomplete="off">
             <template #suffix>
-                <icon-search @click="searchInput" size="20" class="theme-icon p-pointer" />
+                <icon-search @click="handleSearch" size="20" class="theme-icon p-pointer" />
             </template>
         </a-input>
-        <div class="search-containerh-recommend" v-if="searchItems.length">
-            <router-link 
-                :to="`/search?wd=${item.name}`" 
+        <div class="search-containerh-recommend" v-if="searchItems.length && !isMobile">
+            <div 
                 class="recommend-item flex align-center"
                 v-for="item in searchItems" 
                 :key="item.id"
+                @click="handleRecommendItemClick(item)"
             >
                 <span v-html="item.nameAll"></span>
-            </router-link>
+            </div>
         </div>
         <slot></slot>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from "vue";
+import { useRouter, useRoute } from 'vue-router';
 import { getVideoKey } from "@/api/video";
 import { Message } from "@arco-design/web-vue";
+import { useCommonStore } from '@/stores/commonStore';
 
 const router = useRouter();
+const route = useRoute();
+const commonStore = useCommonStore();
+const isMobile = computed(() => commonStore.isMobile);
+
 const props = defineProps({
     isMobile: {
         type: Boolean,
@@ -38,6 +46,35 @@ const props = defineProps({
 const searchValue = ref('');
 const searchItems = ref([]);
 
+// 监听路由变化，更新搜索框的值
+watch(
+    () => route.query.wd,
+    (newWd) => {
+        if (newWd) {
+            searchValue.value = newWd;
+        }
+    },
+    { immediate: true }
+);
+
+// 处理推荐项点击
+const handleRecommendItemClick = (item) => {
+    searchValue.value = item.name;
+    searchBlur();
+    router.push(`/search?wd=${item.name}`);
+};
+
+// 根据设备类型决定搜索行为
+const handleSearchInput = async (value) => {
+    // 移动端不执行快捷检索
+    if (isMobile.value) {
+        return;
+    }
+    
+    // PC端执行快捷检索
+    await searchChange(value);
+};
+
 const searchChange = async (value) => {
     if (!value) {
         searchItems.value = [];
@@ -45,24 +82,58 @@ const searchChange = async (value) => {
     }
     
     try {
-        const { data } = await getVideoKey({
+        const response = await getVideoKey({
             key: value,
             limit: 1,
-            page: 50,
+            page: 15,
         });
 
-        const videoDetailData = JSON.parse(data.value);
-        if (videoDetailData.code === 200) { // 假设状态码OK为200
-            searchItems.value = videoDetailData.data.items?.map((item) => {
-                item.nameAll = item.name.replace(value, `<span class='theme-color'>${value}</span>`)
-                return item;
-            });
+        // 处理响应数据
+        if (response && response.data) {
+            let videoData;
+            
+            // 处理不同的数据结构
+            if (typeof response.data === 'string') {
+                videoData = JSON.parse(response.data);
+            } else if (response.data.value) {
+                // 处理 { data: { value: ... } } 结构
+                if (typeof response.data.value === 'string') {
+                    videoData = JSON.parse(response.data.value);
+                } else {
+                    videoData = response.data.value;
+                }
+            } else {
+                // 直接使用 response.data
+                videoData = response.data;
+            }
+
+            // 根据API响应结构提取items
+            let items = [];
+            if (videoData.data && videoData.data.items) {
+                items = videoData.data.items;
+            } else if (videoData.items) {
+                items = videoData.items;
+            }
+
+            // 处理搜索结果项
+            if (items && items.length > 0) {
+                searchItems.value = items.map((item) => {
+                    if (typeof item.name === 'string') {
+                        item.nameAll = item.name.replace(new RegExp(value, 'gi'), match => 
+                            `<span class='theme-color'>${match}</span>`);
+                    } else {
+                        item.nameAll = item.name || '';
+                    }
+                    return item;
+                });
+            } else {
+                searchItems.value = [];
+            }
         } else {
-            // 处理数据不存在
-            router.push('/404');
+            searchItems.value = [];
         }
     } catch (error) {
-        console.error('搜索失败', error);
+        console.error('搜索失败:', error);
         searchItems.value = [];
     }
 };
@@ -73,7 +144,8 @@ const searchBlur = () => {
     }, 200);
 };
 
-const searchInput = () => {
+// 处理搜索提交
+const handleSearch = () => {
     if (!searchValue.value) {
         Message.error('请输入搜索内容');
         return;
@@ -82,6 +154,17 @@ const searchInput = () => {
     // 跳转search页面
     router.push(`/search?wd=${searchValue.value}`);
 };
+
+// 监听移动设备状态变化
+onMounted(() => {
+    watch(
+        () => commonStore.isMobile,
+        () => {
+            // 清空搜索结果，防止移动端切换到PC时显示搜索结果
+            searchItems.value = [];
+        }
+    );
+});
 </script>
 
 <style lang="less" scoped>

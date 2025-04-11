@@ -1,20 +1,20 @@
 <template>
     <div class="navbar-mobile flex align-center" v-if="currentRoute?.path !== '/search'">
         <div class="navbar-mobile-left flex-base flex align-center">
-            <div class="mobile-left-item flex align-items" v-for="(item, index) in menus" :key="item.name"
+            <div class="mobile-left-item flex align-items" v-for="(item, index) in filteredMenus" :key="item.name"
                 @click="goPath(item, index)">
                 <div class="left-text">{{ item.meta.locale }}</div>
                 <div class="left-current" v-if="activeIndex === index"></div>
             </div>
         </div>
-        <div class="navbar-mobile-right flex align-center content-between">
+        <div class="navbar-mobile-right flex align-center">
             <div class="right-item flex align-center" @click="router.push('/search')">
                 <icon-search size="20" class="right-item-icon" />
             </div>
             <div class="mac_user header-op-user main-btn flash-view theme-button-bg" title="会员中心" @click="openLogin"
                 v-if="!isLogin">登录</div>
             <a-dropdown trigger="click" v-else>
-                <a-avatar :size="40" :image-url="`${baseURL}/app/users/avatar?id=${userInfo?.id}`"
+                <a-avatar :size="40" :image-url="`${baseURL}users/avatar?id=${userInfo?.id}`"
                     :style="{ cursor: 'pointer' }" />
                 <template #content>
                     <a-doption>
@@ -30,10 +30,10 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import { baseURL } from '@/utils/request';
-import { postUserLogoutAPI } from "@/api/user";
+import { postUserLogoutAPI, getUserInfoAPI } from "@/api/user";
 import { useCommonStore } from '@/stores/commonStore';
 
 const route = useRoute();
@@ -59,7 +59,24 @@ const handleLogout = async () => {
 
 onMounted(() => {
     isLogin.value = commonStore.isLogin;
-    userInfo.value = commonStore.userInfo;
+    
+    // 如果用户已登录，先从store获取数据，然后再从API获取最新数据
+    if (isLogin.value) {
+        userInfo.value = commonStore.userInfo;
+        
+        // 调用API获取最新用户信息
+        getUserInfoAPI().then(res => {
+            if (res.data) {
+                const userData = {
+                    ...res.data.data,
+                };
+                commonStore.setUserInfo(userData);
+                userInfo.value = userData;
+            }
+        }).catch(err => {
+            console.error('获取用户信息失败:', err);
+        });
+    }
     
     watch(
         () => commonStore.isLogin,
@@ -104,6 +121,7 @@ const menus = ref([
         meta: {
             locale: "收藏",
             icon: "icon-heart",
+            requiresLogin: true,
         },
     },
     {
@@ -112,6 +130,7 @@ const menus = ref([
         meta: {
             locale: "历史记录",
             icon: "icon-history",
+            requiresLogin: true,
         },
     },
     {
@@ -124,6 +143,17 @@ const menus = ref([
         },
     },
 ]);
+
+// 过滤菜单项，根据登录状态
+const filteredMenus = computed(() => {
+    return menus.value.filter(menu => {
+        // 如果菜单项需要登录但用户未登录，则不显示该项
+        if (menu.meta.requiresLogin && !isLogin.value) {
+            return false;
+        }
+        return true;
+    });
+});
 
 const activeIndex = ref(0);
 
@@ -139,16 +169,24 @@ const goPath = (item, index) => {
 // 初始化根据当前路由设置活动菜单
 const init = () => {
     const currentPath = route.path;
-    menus.value.forEach((menu, index) => {
+    filteredMenus.value.forEach((menu, index) => {
         if (menu.path === currentPath) {
             activeIndex.value = index;
         }
     });
-}
+};
+
+// 监听路由变化，更新选中的菜单项
+watch(
+    () => route.path,
+    () => {
+        init();
+    }
+);
 
 onMounted(() => {
     init();
-})
+});
 </script>
 
 <style lang="less" scoped>
@@ -165,9 +203,11 @@ onMounted(() => {
     }
 
     .navbar-mobile-right {
-        width: 130px;
+        width: 110px;
         height: 100%;
         margin-left: 8px;
+        justify-content: flex-end;
+        gap: 10px;
     }
 
     .navbar-mobile-left {
@@ -200,6 +240,10 @@ onMounted(() => {
             left: 20%;
             z-index: 1;
         }
+    }
+    
+    .right-item {
+        margin-right: 0;
     }
 }
 </style> 

@@ -24,8 +24,10 @@
                 </a-input-password>
             </div>
             <a-button type="primary" class="login-btn flash-view" @click="handleLogin">登录</a-button>
-            <div class="footer-links">
+            <div class="register-link">
                 <span @click="switchToRegister" class="p-pointer">注册账号</span>
+            </div>
+            <div class="footer-links">
                 <!-- <span>忘记密码</span> -->
             </div>
         </div>
@@ -62,6 +64,8 @@ watch(
 // 登录表单
 const loginForm = reactive({
     username: '',
+    phone: '',
+    email: '',
     password: '',
     enum: 0
 });
@@ -80,25 +84,42 @@ function handleLogin() {
     if (!usernameError.value) {
         // 判断数据类型, 手机号为0, 邮箱为1
         if (loginForm.username.includes("@")) {
+            loginForm.email = loginForm.username;
             loginForm.enum = 1;
+        } else {
+            loginForm.phone = loginForm.username;
+            loginForm.enum = 0;
         }
         
         postLoginAPI(loginForm).then(res => {
-            if (res.data.code !== 200) { // 假设状态码OK为200
+            if (!res.data) {
                 Message.error(res.data.message);
                 return;
             }
             
+            // 成功处理
             commonStore.setIsShowLoginModal(false);
             commonStore.setLoginState(true);
-            commonStore.setToken(res.data.data.token);
-
-            // 获取用户信息
+            
+            // 保存token
+            const token = res.data.data.token;
+            commonStore.setToken(token);
+            
+            // 获取用户信息并储存
             getUserInfoAPI().then(userRes => {
-                if (userRes.data.code === 200) {
-                    commonStore.setUserInfo(userRes.data.data);
+                if (userRes.data.code === 20000) {
+                    // 确保用户ID正确保存
+                    const userData = {
+                        ...userRes.data.data,
+                        id: res.data.data.id // 保存登录接口返回的用户ID
+                    };
+                    commonStore.setUserInfo(userData);
                 }
-                // 刷新下当前页面
+                // 刷新当前页面
+                location.reload();
+            }).catch(err => {
+                console.error('获取用户信息失败:', err);
+                // 即使获取用户信息失败，登录仍然成功
                 location.reload();
             });
         }).catch(err => {
@@ -250,10 +271,56 @@ h2 {
     
     @media screen and (max-width: 480px) {
         height: 44px;
+        font-size: 15px;
+        margin: 20px 0 15px;
+    }
+}
+
+.login-title {
+    position: relative;
+
+    .login-title-text {
+        position: relative;
+        z-index: 2;
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        width: 100px;
+        height: 15px;
+        left: 50%;
+        margin-left: -50px;
+        background: #ffddd5;
+        bottom: 3px;
+        border-radius: 4px;
+        transform: skewX(-15deg);
+        z-index: 1;
     }
 }
 
 .footer-links {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+
+    span {
+        color: #666;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            color: #f596aa;
+        }
+    }
+    
+    @media screen and (max-width: 480px) {
+        font-size: 13px;
+    }
+}
+
+.register-link {
     display: flex;
     justify-content: center;
     gap: 30px;
@@ -285,4 +352,42 @@ h2 {
         }
     }
 }
-</style> 
+
+// 添加动画效果
+.flash-view {
+    position: relative;
+    overflow: hidden;
+    
+    &::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(30deg);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    &:hover::after {
+        opacity: 1;
+        animation: flash 1.5s infinite;
+    }
+}
+
+@keyframes flash {
+    0% {
+        transform: translate(-100%, -100%) rotate(30deg);
+    }
+    100% {
+        transform: translate(100%, 100%) rotate(30deg);
+    }
+}
+</style>

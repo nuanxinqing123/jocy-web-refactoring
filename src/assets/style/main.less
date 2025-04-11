@@ -1,0 +1,285 @@
+@import './variables.less';
+
+* {
+    box-sizing: border-box;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    background-color: var(--color-bg-1);
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    // min-width: 1200px;
+}
+
+
+.general-card {
+    border: none;
+    border-radius: 4px;
+
+    &>.arco-card-header {
+        height: auto;
+        padding: 20px;
+        border: none;
+    }
+
+    &>.arco-card-body {
+        padding: 0 20px 20px 20px;
+    }
+}
+
+.split-line {
+    border-color: rgb(var(--gray-2));
+}
+
+.arco-table-cell {
+    .circle {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 4px;
+        background-color: rgb(var(--blue-6));
+        border-radius: 50%;
+
+        &.pass {
+            background-color: rgb(var(--green-6));
+        }
+    }
+}
+
+
+/* flex布局 */
+
+.flex {
+    display: -webkit-box;
+    display: -webkit-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.flex-base {
+    flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+}
+
+.flex-grow-base {
+    flex-grow: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-grow: 1;
+}
+
+.flex-flow {
+    flex-flow: row wrap;
+}
+
+.flex-start {
+    align-content: flex-start;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-row {
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+
+/* flexColumn */
+
+.flex-column {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+}
+
+/* 项目在主轴上的对齐方式 */
+.align-items {
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.content-between {
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
+
+.content-around {
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+}
+
+.content-center {
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.content-end {
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+}
+
+/* 项目在交叉轴上如何对齐 */
+
+.align-and {
+    -webkit-align-items: flex-end;
+    align-items: flex-end;
+}
+
+.align-center {
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+/* 项目在多根轴线上对齐方式 */
+
+.items-between {
+    -webkit-align-content: space-between;
+    align-content: space-between;
+}
+
+.items-center {
+    -webkit-align-content: center;
+    align-content: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+// 让flex支持宽度
+.flex-width {
+    // TODO 让flex 支持设置宽度
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+// 吸顶
+.view-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 9;
+}
+
+// 登录弹窗
+.login-modal {
+    .arco-modal-header {
+        display: none;
+    }
+}
+
+.p-pointer {
+    cursor: pointer;
+}
+
+// 闪烁效果
+.flash-view {
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(-45deg, transparent 30%, transparent, rgba(255, 255, 255, .5), transparent 70%) no-repeat;
+        background-size: 200% 200%;
+        background-position: 200% 200%;
+    }
+
+    &:hover::before {
+        transition: background-position 1s;
+        background-position: -100% -100%;
+    }
+}
+
+// 主题色button
+.theme-button-bg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    cursor: pointer;
+    padding: 0px 16px;
+    background: @bgColor;
+    border-radius: 42px !important;
+    font-size: 14px;
+    font-weight: 500;
+    height: 30px;
+    color: #fff;
+}
+
+.theme-button-border {
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    cursor: pointer;
+    padding: 0px 16px;
+    border: 1px solid @color;
+    border-radius: 42px;
+    color: @color;
+    font-size: 14px;
+    font-weight: 500;
+    background: #fff;
+    cursor: pointer;
+
+    &:hover {
+        background: @bgColor;
+        color: #fff;
+    }
+}
+
+// 主题色
+.theme-color {
+    background: @bgColor;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.theme-color-hover {
+    &:hover {
+        background: @bgColor  !important;
+        -webkit-background-clip: text !important;
+        color: transparent !important;
+
+    }
+}
+
+.theme-color-text-hover {
+    &:hover {
+        color: @color  !important;
+    }
+}
+
+.theme-icon {
+    color: @color  !important;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+// 超过一行隐藏
+.hide-overflow {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.clear-both {
+    clear: both;
+}

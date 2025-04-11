@@ -7,7 +7,7 @@
         <div class="video-section">
             <div class="section-header">
                 <h2 class="section-title">推荐 · 日漫</h2>
-                <a href="javascript:;" class="more-link">查看更多 <icon-arrow-right /></a>
+                <router-link :to="{ path: '/library', query: { channel: '1', sort: 'addtime' } }" class="more-link">查看更多 <IconArrowRight /></router-link>
             </div>
             <VideoItem :channel="'1'" :sort="'weight'"/>
         </div>
@@ -16,7 +16,7 @@
         <div class="video-section">
             <div class="section-header">
                 <h2 class="section-title">推荐 · 国漫</h2>
-                <a href="javascript:;" class="more-link">查看更多 <icon-arrow-right /></a>
+                <router-link :to="{ path: '/library', query: { channel: '2', sort: 'addtime' } }" class="more-link">查看更多 <IconArrowRight /></router-link>
             </div>
             <VideoItem :channel="'2'" :sort="'weight'"/>
         </div>
@@ -25,7 +25,7 @@
         <div class="video-section">
             <div class="section-header">
                 <h2 class="section-title">推荐 · 动漫电影</h2>
-                <a href="javascript:;" class="more-link">查看更多 <icon-arrow-right /></a>
+                <router-link :to="{ path: '/library', query: { channel: '26', sort: 'addtime' } }" class="more-link">查看更多 <IconArrowRight /></router-link>
             </div>
             <VideoItem :channel="'26'" :sort="'weight'"/>
         </div>
@@ -34,7 +34,7 @@
         <div class="video-section">
             <div class="section-header">
                 <h2 class="section-title">推荐 · 其他动漫</h2>
-                <a href="javascript:;" class="more-link">查看更多 <icon-arrow-right /></a>
+                <router-link :to="{ path: '/library', query: { channel: '3', sort: 'addtime' } }" class="more-link">查看更多 <IconArrowRight /></router-link>
             </div>
             <VideoItem :channel="'3'" :sort="'weight'"/>
         </div>
@@ -46,6 +46,7 @@ import { onMounted } from 'vue';
 import Carousel from '@/components/carousel/index.vue';
 import VideoItem from '@/components/video-item/index.vue';
 import { useCommonStore } from '@/stores/commonStore';
+import { IconArrowRight } from '@arco-design/web-vue/es/icon';
 
 const commonStore = useCommonStore();
 

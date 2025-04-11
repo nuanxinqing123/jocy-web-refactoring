@@ -94,6 +94,11 @@ const total = ref(0);
 const loading = ref(false);
 const hasMore = ref(true);
 
+// 计算实际要使用的限制数
+const actualLimit = computed(() => {
+    return isMobile.value ? 6 : props.limit;
+});
+
 // 获取频道数据
 const getVideoList = async (isLoadMore = false) => {
     if (loading.value || (!isLoadMore && !hasMore.value)) return;
@@ -102,6 +107,7 @@ const getVideoList = async (isLoadMore = false) => {
     try {
         const res = await getVideoListAPI({
             ...props,
+            limit: actualLimit.value,
             page: currentPage.value
         });
 
@@ -136,7 +142,8 @@ watch(
         sort: props.sort,
         type: props.type,
         area: props.area,
-        year: props.year
+        year: props.year,
+        isMobile: isMobile.value
     }),
     () => {
         currentPage.value = 1;

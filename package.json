@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "artplayer": "^5.2.2",
     "axios": "^1.8.4",
     "crypto-js": "^4.2.0",
     "less": "^4.3.0",

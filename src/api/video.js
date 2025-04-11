@@ -93,10 +93,10 @@ export function postHistoryAPI(params) {
     return request.post('history', params)
 }
 
-// 获取视频搜索建议
+// 获取视频预搜索
 export function getVideoKey(params) {
     return request({
-        url: '/videos/search/suggest',
+        url: 'video/key',
         method: 'get',
         params
     });
@@ -114,6 +114,15 @@ export function getVideoDetail(id) {
 export function getVideoList(params) {
     return request({
         url: '/videos/list',
+        method: 'get',
+        params
+    });
+}
+
+// 获取视频搜索结果
+export function getVideoSearch(params) {
+    return request({
+        url: '/video/search',
         method: 'get',
         params
     });

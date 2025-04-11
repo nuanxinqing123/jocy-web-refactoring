@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import './style.css'
 import '@arco-design/web-vue/dist/arco.css';
+import './assets/style/main.less'
 import App from './App.vue'
 import ArcoVue from '@arco-design/web-vue';
 import IconComponents from './components/icons'
@@ -38,6 +39,16 @@ const router = createRouter({
       path: '/search', 
       name: 'search',
       component: () => import('./pages/Search.vue') 
+    },
+    { 
+      path: '/detail/:id', 
+      name: 'detail',
+      component: () => import('./pages/detail/index.vue') 
+    },
+    { 
+      path: '/video/:id', 
+      name: 'video',
+      component: () => import('./pages/video/index.vue') 
     },
     { 
       path: '/:pathMatch(.*)*', 
