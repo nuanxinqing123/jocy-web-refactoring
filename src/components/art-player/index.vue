@@ -49,11 +49,11 @@ const getDanmuData = async (startTime, endTime) => {
       limit: 100,
       page: 1
     };
-    
+
     const res = await getDanmuAPI(params);
-    if (res && res.data && res.data.items && Array.isArray(res.data.items)) {
+    if (res.data) {
       // 处理弹幕数据
-      return res.data.items.map(item => {
+      return res.data.data.items.map(item => {
         try {
           let contentObj;
           try {
@@ -64,7 +64,7 @@ const getDanmuData = async (startTime, endTime) => {
             console.warn('弹幕内容JSON解析失败:', parseError);
             contentObj = { content: item.content, color: 4294967295 }; // 默认白色
           }
-          
+
           // 转换弹幕格式为artplayer-plugin-danmuku需要的格式
           return {
             text: contentObj.content || '弹幕内容',
@@ -114,7 +114,7 @@ const initPlayer = () => {
       // 默认返回空数组，初始不加载弹幕
       return [];
     },
-    speed: 5, // 弹幕速度
+    speed: 7, // 弹幕速度
     opacity: 0.9, // 弹幕透明度
     fontSize: 25, // 弹幕字体大小
     color: '#FFFFFF', // 默认颜色
@@ -147,7 +147,7 @@ const initPlayer = () => {
     setting: true,
     playbackRate: true,
     aspectRatio: true,
-    screenshot: true,
+    screenshot: false,
     hotkey: true,
     autoPlayback: true,
     mutex: true,
@@ -174,17 +174,7 @@ const initPlayer = () => {
       icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M17.5 2h-11c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5.5 6c0 .55-.45 1-1 1H9c-.55 0-1-.45-1-1s.45-1 1-1h2c.55 0 1 .45 1 1zm4 2c0 .55-.45 1-1 1H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1zm-9 6h11c1.1 0 2 .9 2 2v2h-15v-2c0-1.1.9-2 2-2z"/></svg>',
       tooltip: '弹幕开关',
       switch: true,
-      default: true,
-      onSwitch: function(enabled) {
-        if (art && art.plugins.artplayerPluginDanmuku) {
-          if (enabled) {
-            art.plugins.artplayerPluginDanmuku.show();
-          } else {
-            art.plugins.artplayerPluginDanmuku.hide();
-          }
-        }
-        return enabled;
-      }
+      default: true
     }
   ];
 
@@ -204,7 +194,7 @@ const initPlayer = () => {
       part: props.part,
       time_point: 0
     }).catch(err => console.error('初始播放记录保存失败', err));
-    
+
     // 初始加载弹幕
     loadDanmuku(0, 60);
   });
@@ -226,10 +216,10 @@ const initPlayer = () => {
       // 将时间转换为毫秒
       const start = Math.floor(startTime * 1000);
       const end = Math.floor(endTime * 1000);
-      
+
       // 获取弹幕数据
       const danmuList = await getDanmuData(start, end);
-      
+
       // 添加弹幕到播放器[循环添加]
       danmuList.forEach(danmu => {
         art.plugins.artplayerPluginDanmuku.emit(danmu);
