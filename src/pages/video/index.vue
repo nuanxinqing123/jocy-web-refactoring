@@ -131,11 +131,11 @@ const getVideoDetail = async () => {
             }
         } else {
             // 处理数据不存在
-            router.push('/404');
+            await router.push('/404');
         }
     } catch (error) {
         console.error('获取视频详情失败:', error);
-        router.push('/404');
+        await router.push('/404');
     }
 };
 
@@ -222,11 +222,6 @@ onMounted(() => {
         border-radius: 12px;
         overflow: hidden;
         aspect-ratio: 16/9;
-        transform: translateZ(0);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        will-change: transform;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 
         .player-placeholder {
             width: 100%;
