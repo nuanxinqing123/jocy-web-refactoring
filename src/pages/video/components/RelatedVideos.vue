@@ -75,7 +75,7 @@ const fetchRelatedVideos = async () => {
     const res = await getVideoListAPI({
       ...props
     });
-    
+
     if (res.data) {
       videos.value = res.data.data?.items || [];
     } else {
@@ -118,6 +118,7 @@ onMounted(() => {
   padding: 16px;
 
   .title {
+    color: #666666;
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 16px;
@@ -173,11 +174,12 @@ onMounted(() => {
           -webkit-line-clamp: 2;
           line-clamp: 2;
           -webkit-box-orient: vertical;
+          color: #666666;
         }
 
         .video-meta {
           font-size: 12px;
-          color: #999;
+          color: #666666;
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
@@ -192,4 +194,4 @@ onMounted(() => {
     display: none;
   }
 }
-</style> 
+</style>
