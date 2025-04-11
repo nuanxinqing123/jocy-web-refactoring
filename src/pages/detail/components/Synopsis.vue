@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { Message } from '@arco-design/web-vue';
 import { IconPlayCircle, IconStar, IconStarFill } from '@arco-design/web-vue/es/icon';
@@ -90,7 +90,7 @@ const hasHistory = computed(() => {
 // 格式化时间
 const formatTime = (timestamp) => {
     if (!timestamp) return '未知';
-    
+
     const date = new Date(timestamp * 1000);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
@@ -104,14 +104,14 @@ const handlePlay = () => {
             router.push(`/video/${props.detail.id}?play=${player}&part=${part}&t=${time_point}`);
             return;
         }
-        
+
         // 如果没有历史记录，则使用第一个播放线路和剧集
         if (props.detail.parts && props.detail.parts.length > 0) {
             // 获取第一个播放线路
             const firstPlayType = props.detail.parts[0].play;
             // 获取该线路的第一个剧集
             const firstEpisode = props.detail.parts[0].part?.[0];
-            
+
             if (firstEpisode) {
                 // 跳转到视频播放页面
                 router.push(`/video/${props.detail.id}?play=${firstPlayType}&part=${firstEpisode}`);
@@ -127,7 +127,7 @@ const handlePlay = () => {
 const handleCollect = async () => {
     try {
         if (!props.detail?.id) return;
-        
+
         // 检查用户是否已登录
         if (!commonStore.token) {
             Message.info({
@@ -138,7 +138,7 @@ const handleCollect = async () => {
             commonStore.setIsShowLoginModal(true);
             return;
         }
-        
+
         if (props.detail.iscollect === 1) {
             // 取消收藏
             await deleteVideoCollect({ vid: props.detail.id });
@@ -294,7 +294,7 @@ const handleCollect = async () => {
             border: none;
             font-size: 15px;
             transition: all 0.3s ease;
-            
+
             :deep(.arco-icon) {
                 margin-right: 4px;
             }
@@ -303,7 +303,7 @@ const handleCollect = async () => {
         .play-btn {
             background: linear-gradient(90deg, rgb(244, 167, 185), rgb(245, 150, 170));
             color: white;
-            
+
             &:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(244, 167, 185, 0.4);
@@ -314,13 +314,13 @@ const handleCollect = async () => {
             background: white;
             color: var(--color-text-2);
             border: 1px solid var(--color-neutral-3);
-            
+
             &:hover {
                 color: #f596aa;
                 border-color: #f596aa;
                 background: white;
             }
-            
+
             &.is-collected {
                 color: #f596aa;
                 border-color: #f596aa;
@@ -329,4 +329,4 @@ const handleCollect = async () => {
         }
     }
 }
-</style> 
+</style>

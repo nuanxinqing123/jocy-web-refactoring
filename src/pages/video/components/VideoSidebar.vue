@@ -17,9 +17,9 @@
         <div class="play-types">
           <div class="section-title">选集播放</div>
           <div class="scroll-container" ref="scrollContainer">
-            <span 
-              v-for="item in parts" 
-              :key="item.play" 
+            <span
+              v-for="item in parts"
+              :key="item.play"
               :class="{ active: currentPlayType === item.play }"
               @click="handlePlayTypeChange(item)"
             >
@@ -30,14 +30,14 @@
         </div>
       </div>
       <div class="list">
-        <div 
-          v-for="(episode, index) in sortedEpisodes" 
-          :key="index" 
+        <div
+          v-for="(episode, index) in sortedEpisodes"
+          :key="index"
           class="episode-item"
           :class="{
             active: currentEpisode === episode,
             'is-playing': currentEpisode === episode
-          }" 
+          }"
           @click="$emit('episode-change', episode, currentPlayType)"
         >
           {{ episode }}
@@ -117,11 +117,11 @@ const currentPart = computed(() => {
 // 计算排序后的剧集列表
 const sortedEpisodes = computed(() => {
   if (!currentPart.value?.part) return [];
-  
+
   const episodes = [...currentPart.value.part].sort((a, b) => {
     return Number(a) - Number(b);
   });
-  
+
   return isDesc.value ? episodes.reverse() : episodes;
 });
 
@@ -156,10 +156,10 @@ const toggleSort = () => {
 // 切换下一集
 const handleNextEpisode = () => {
   if (!currentPart.value?.part) return;
-  
+
   // 获取当前剧集在排序后列表中的索引
   const currentIndex = sortedEpisodes.value.findIndex(episode => episode === props.currentEpisode);
-  
+
   // 如果找到当前剧集并且不是最后一集
   if (currentIndex !== -1 && currentIndex < sortedEpisodes.value.length - 1) {
     const nextEpisode = sortedEpisodes.value[currentIndex + 1];
@@ -225,7 +225,7 @@ onUnmounted(() => {
         font-size: 20px;
         font-weight: bold;
         color: #333;
-        margin-top: 0px;
+        margin-top: 0;
         margin-bottom: 12px;
         line-height: 1.4;
     }
@@ -463,4 +463,4 @@ onUnmounted(() => {
         }
     }
 }
-</style> 
+</style>

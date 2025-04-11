@@ -29,12 +29,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import Search from "./Search.vue";
 import { useCommonStore } from '@/stores/commonStore';
 import { postUserLogoutAPI, getUserInfoAPI } from "@/api/user";
 import { baseURL } from '@/utils/request';
+import {IconExport, IconHeart, IconHistory} from "@/components/icons/index.js";
 
 const router = useRouter();
 const commonStore = useCommonStore();
@@ -43,11 +44,11 @@ const userInfo = ref({});
 
 onMounted(() => {
     isLogin.value = commonStore.isLogin;
-    
+
     // 如果用户已登录，先从store获取数据，然后再从API获取最新数据
     if (isLogin.value) {
         userInfo.value = commonStore.userInfo;
-        
+
         // 调用API获取最新用户信息
         getUserInfoAPI().then(res => {
             if (res.data) {
@@ -61,14 +62,14 @@ onMounted(() => {
             console.error('获取用户信息失败:', err);
         });
     }
-    
+
     watch(
         () => commonStore.isLogin,
         (newValue) => {
             isLogin.value = newValue;
         }
     );
-    
+
     watch(
         () => commonStore.userInfo,
         (newValue) => {
@@ -121,7 +122,7 @@ const handleLogout = async () => {
         margin-right: 5px;
         color: #000;
     }
-    
+
     .right-item-text {
         color: #000;
     }
@@ -166,4 +167,4 @@ const handleLogout = async () => {
         display: none;
     }
 }
-</style> 
+</style>

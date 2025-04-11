@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, nextTick, onUnmounted } from 'vue';
+import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue';
 import { IconUp, IconDown } from '@arco-design/web-vue/es/icon';
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from '@/stores/commonStore';
@@ -39,26 +39,26 @@ const lineHeight = ref(22); // 默认行高
 // 计算文本是否超出了最大行数限制
 const checkOverflow = async () => {
     if (!textRef.value) return;
-    
+
     // 等待DOM更新
     await nextTick();
-    
+
     // 计算文本实际高度
     const element = textRef.value;
     const computedStyle = window.getComputedStyle(element);
-    
+
     // 获取实际行高
     lineHeight.value = parseInt(computedStyle.lineHeight) || 22;
-    
+
     // 计算最大高度
     const maxHeight = props.maxLines * lineHeight.value;
-    
+
     // 检查是否需要显示展开/收起按钮
     const actualHeight = element.scrollHeight;
-    
+
     // 如果实际高度大于最大高度，则需要显示按钮
     showButton.value = actualHeight > maxHeight;
-    
+
     // 如果需要显示按钮，且未展开，则应用最大高度限制
     if (showButton.value && !isExpanded.value) {
         element.style.maxHeight = `${maxHeight}px`;
@@ -70,7 +70,7 @@ const checkOverflow = async () => {
 // 切换展开/收起状态
 const toggleExpand = () => {
     isExpanded.value = !isExpanded.value;
-    
+
     if (isExpanded.value) {
         textRef.value.style.maxHeight = 'none';
     } else {
@@ -95,7 +95,7 @@ watch(() => isMobile.value, (newValue) => {
 // 初始化
 onMounted(() => {
     checkOverflow();
-    
+
     // 监听窗口大小变化，重新计算
     window.addEventListener('resize', checkOverflow);
 });
@@ -109,19 +109,19 @@ onUnmounted(() => {
 <style scoped lang="less">
 .text-fold {
     margin-bottom: 16px;
-    
+
     .text-content {
         overflow: hidden;
         position: relative;
         transition: max-height 0.3s ease;
-        
+
         p {
             margin: 0;
             line-height: 1.6;
             color: var(--color-text-2);
             word-break: break-word;
         }
-        
+
         &:not(.expanded)::after {
             content: '';
             position: absolute;
@@ -132,7 +132,7 @@ onUnmounted(() => {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
         }
     }
-    
+
     .text-fold-button {
         margin-top: 8px;
         display: inline-flex;
@@ -142,10 +142,10 @@ onUnmounted(() => {
         cursor: pointer;
         user-select: none;
         font-size: 14px;
-        
+
         &:hover {
             opacity: 0.8;
         }
     }
 }
-</style> 
+</style>

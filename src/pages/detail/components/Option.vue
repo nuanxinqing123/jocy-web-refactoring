@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { IconSort } from '@arco-design/web-vue/es/icon';
 
@@ -71,14 +71,14 @@ const getSortedParts = (parts) => {
 const isCurrentEpisode = (episode, play) => {
     // 从数据看，episode可能是"第2集"这种格式的字符串
     // 确保字符串比较完全相等，不考虑数字部分
-    return String(currentEpisode.value).trim() === String(episode).trim() && 
+    return String(currentEpisode.value).trim() === String(episode).trim() &&
            String(currentPlayer.value).trim() === String(play).trim();
 };
 
 // 找到历史记录对应的标签页索引
 const findTabIndexByPlayer = (player) => {
     if (!props.parts || !player) return '0';
-    
+
     const index = props.parts.findIndex(item => item.play === player);
     return index >= 0 ? String(index) : '0';
 };
@@ -292,4 +292,4 @@ const handleEpisodeClick = (episode, play) => {
         color: #fff !important;
     }
 }
-</style> 
+</style>

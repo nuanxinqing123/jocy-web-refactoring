@@ -35,6 +35,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { baseURL } from '@/utils/request';
 import { postUserLogoutAPI, getUserInfoAPI } from "@/api/user";
 import { useCommonStore } from '@/stores/commonStore';
+import {IconExport, IconSearch} from "@/components/icons/index.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -59,11 +60,11 @@ const handleLogout = async () => {
 
 onMounted(() => {
     isLogin.value = commonStore.isLogin;
-    
+
     // 如果用户已登录，先从store获取数据，然后再从API获取最新数据
     if (isLogin.value) {
         userInfo.value = commonStore.userInfo;
-        
+
         // 调用API获取最新用户信息
         getUserInfoAPI().then(res => {
             if (res.data) {
@@ -77,14 +78,14 @@ onMounted(() => {
             console.error('获取用户信息失败:', err);
         });
     }
-    
+
     watch(
         () => commonStore.isLogin,
         (newValue) => {
             isLogin.value = newValue;
         }
     );
-    
+
     watch(
         () => commonStore.userInfo,
         (newValue) => {
@@ -148,10 +149,7 @@ const menus = ref([
 const filteredMenus = computed(() => {
     return menus.value.filter(menu => {
         // 如果菜单项需要登录但用户未登录，则不显示该项
-        if (menu.meta.requiresLogin && !isLogin.value) {
-            return false;
-        }
-        return true;
+        return !(menu.meta.requiresLogin && !isLogin.value);
     });
 });
 
@@ -216,8 +214,6 @@ onMounted(() => {
     }
 
     .mobile-left-item {
-        flex-grow: 0;
-        flex-shrink: 0;
         font-size: 16px;
         font-weight: 700;
         color: #616161;
@@ -241,9 +237,9 @@ onMounted(() => {
             z-index: 1;
         }
     }
-    
+
     .right-item {
         margin-right: 0;
     }
 }
-</style> 
+</style>

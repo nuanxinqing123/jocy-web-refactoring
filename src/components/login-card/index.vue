@@ -10,7 +10,7 @@
             </div>
             <h2 class="login-title"><span class="login-title-text">用户登录</span></h2>
             <div class="input-group">
-                <a-input v-model="loginForm.username" placeholder="手机号/邮箱" @blur="validateUsername" 
+                <a-input v-model="loginForm.username" placeholder="手机号/邮箱" @blur="validateUsername"
                     :style="{ marginBottom: usernameError ? '5px' : '20px' }">
                     <template #prefix>
                         <icon-user />
@@ -90,21 +90,21 @@ function handleLogin() {
             loginForm.phone = loginForm.username;
             loginForm.enum = 0;
         }
-        
+
         postLoginAPI(loginForm).then(res => {
             if (!res.data) {
                 Message.error(res.data.message);
                 return;
             }
-            
+
             // 成功处理
             commonStore.setIsShowLoginModal(false);
             commonStore.setLoginState(true);
-            
+
             // 保存token
             const token = res.data.data.token;
             commonStore.setToken(token);
-            
+
             // 获取用户信息并储存
             getUserInfoAPI().then(userRes => {
                 if (userRes.data.code === 20000) {
@@ -131,13 +131,13 @@ function handleLogin() {
 
 function validateUsername() {
     const phoneRegex = /^1[3-9]\d{9}$/;
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
     if (loginForm.username === "") {
         usernameError.value = "";
         return;
     }
-    
+
     if (!phoneRegex.test(loginForm.username) && !emailRegex.test(loginForm.username)) {
         usernameError.value = "请输入有效的手机号或邮箱";
     } else {
@@ -160,7 +160,7 @@ const closeLoginModal = () => {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     max-width: 420px;
     margin: 0 auto;
-    
+
     @media screen and (max-width: 480px) {
         max-width: 100%;
         margin: 0 15px;
@@ -209,7 +209,7 @@ h2 {
     font-size: 26px;
     color: #333;
     margin-bottom: 30px;
-    
+
     @media screen and (max-width: 480px) {
         font-size: 22px;
         margin-bottom: 25px;
@@ -218,26 +218,26 @@ h2 {
 
 .input-group {
     margin-bottom: 10px;
-    
+
     :deep(.arco-input-wrapper) {
         background-color: #f8f8f8;
         border: 1px solid #eee;
         border-radius: 10px;
         padding: 10px 15px;
         transition: all 0.3s ease;
-        
+
         &:hover, &:focus-within {
             border-color: #f596aa;
             background-color: #fff;
             box-shadow: 0 0 0 2px rgba(245, 150, 170, 0.1);
         }
-        
+
         .arco-input-prefix {
             margin-right: 10px;
             color: #999;
         }
     }
-    
+
     :deep(.arco-input) {
         font-size: 15px;
     }
@@ -268,7 +268,7 @@ h2 {
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(245, 150, 170, 0.4);
     }
-    
+
     @media screen and (max-width: 480px) {
         height: 44px;
         font-size: 15px;
@@ -309,12 +309,12 @@ h2 {
         font-size: 14px;
         cursor: pointer;
         transition: all 0.3s ease;
-        
+
         &:hover {
             color: #f596aa;
         }
     }
-    
+
     @media screen and (max-width: 480px) {
         font-size: 13px;
     }
@@ -327,15 +327,15 @@ h2 {
     font-size: 14px;
     color: #999;
     transition: all 0.3s ease;
-    
+
     span {
         transition: all 0.3s ease;
         position: relative;
-        
+
         &:hover {
             color: #f596aa;
         }
-        
+
         &::after {
             content: '';
             position: absolute;
@@ -346,7 +346,7 @@ h2 {
             background-color: #f596aa;
             transition: all 0.3s ease;
         }
-        
+
         &:hover::after {
             width: 100%;
         }
@@ -357,7 +357,7 @@ h2 {
 .flash-view {
     position: relative;
     overflow: hidden;
-    
+
     &::after {
         content: "";
         position: absolute;
@@ -375,7 +375,7 @@ h2 {
         opacity: 0;
         transition: opacity 0.3s;
     }
-    
+
     &:hover::after {
         opacity: 1;
         animation: flash 1.5s infinite;

@@ -14,12 +14,12 @@
                 <p v-else>请输入搜索关键词</p>
                 <Divider />
             </div>
-            
+
             <!-- 加载状态 -->
             <div v-if="loading" class="loading-container">
                 <Spin :size="30" tip="搜索中..."></Spin>
             </div>
-            
+
             <div v-else class="search-container-content flex flex-wrap content-between">
                 <!-- 空结果提示 -->
                 <div v-if="searchWd && !videoList.length" class="empty-state">
@@ -37,7 +37,7 @@
                 <!-- 搜索结果列表 -->
                 <div class="content-video" v-for="(item, index) in videoList" :key="index">
                     <div class="content-video-img" @click="router.push(`/video/${item.id}`)">
-                        <img :src="item.pic" class="video-img" alt="视频封面" 
+                        <img :src="item.pic" class="video-img" alt="视频封面"
                             @error="e => e.target.src = 'https://placeholder.pics/svg/200x280/DEDEDE/555555/暂无封面'" />
                         <div class="video-img-text text-center">{{ item.continu }}</div>
                     </div>
@@ -64,8 +64,8 @@
                     </div>
                     <div class="content-video-bg"></div>
                     <!-- 连载状态标签 -->
-                    <div class="info-icon" v-if="item.isend == 0">连载中</div>
-                    <div class="info-icon" v-if="item.isend == 1">已完结</div>
+                    <div class="info-icon" v-if="item.isend === 0">连载中</div>
+                    <div class="info-icon" v-if="item.isend === 1">已完结</div>
                 </div>
             </div>
         </div>
@@ -99,7 +99,7 @@ const fetchData = async () => {
         videoList.value = [];
         return;
     }
-    
+
     loading.value = true;
     try {
         const response = await getVideoSearch({
@@ -107,7 +107,7 @@ const fetchData = async () => {
             limit: 25,
             page: 1,
         });
-        
+
         if (response && response.data) {
             videoList.value = response.data.data.items || [];
         } else {
@@ -151,35 +151,35 @@ defineExpose({
 <style scoped lang="less">
 .search-container {
     padding: 20px;
-    
+
     .mobile-search-header {
         margin-bottom: 20px;
-        
+
         .search-cancel-btn {
             cursor: pointer;
             margin-left: 10px;
             color: #f596aa;
             font-size: 16px;
             transition: color 0.3s;
-            
+
             &:hover {
                 color: darken(#f596aa, 10%);
             }
         }
     }
-    
+
     .search-result-area {
         .search-container-top {
             font-size: 18px;
             font-weight: bold;
             color: var(--color-text);
             margin-bottom: 16px;
-            
+
             .theme-color {
                 color: var(--color-primary);
             }
         }
-        
+
         .loading-container {
             display: flex;
             justify-content: center;
@@ -227,9 +227,7 @@ defineExpose({
     border-radius: 8px;
     margin-bottom: 40px;
     position: relative;
-    padding: 10px;
-    padding-left: 150px;
-    padding-top: 0px;
+    padding: 0 10px 10px 150px;
     float: left;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
@@ -268,7 +266,6 @@ defineExpose({
     .content-video-bg {
         position: absolute;
         bottom: 10px;
-        z-index: 1;
         left: 10px;
         width: calc(100% - 20px);
         height: 30px;
@@ -285,40 +282,40 @@ defineExpose({
         right: 0;
         width: 100%;
         padding-right: 10px;
-        
+
         .info-title {
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 5px;
             cursor: pointer;
-            
+
             &:hover {
                 color: var(--color-primary);
             }
         }
-        
+
         .info-type {
             font-size: 14px;
             color: #666;
             margin-bottom: 5px;
-            
+
             .divider-line {
                 display: inline-block;
                 margin: 0 4px;
                 color: #999;
             }
         }
-        
+
         .info-actions {
             position: absolute;
             bottom: -40px;
             left: 160px;
             z-index: 5;
             display: flex;
-            
+
             .btn-actions {
                 margin-right: 10px;
-                
+
                 .play-btn, .detail-btn {
                     padding: 6px 12px;
                     border-radius: 4px;
@@ -328,12 +325,12 @@ defineExpose({
                     align-items: center;
                     gap: 4px;
                 }
-                
+
                 .play-btn {
                     background-color: var(--color-primary);
                     color: #fff;
                 }
-                
+
                 .detail-btn {
                     border: 1px solid var(--color-primary);
                     color: var(--color-primary);
@@ -352,7 +349,7 @@ defineExpose({
         cursor: pointer;
         overflow: hidden;
         border-radius: 8px;
-        
+
         &:hover {
             .video-img {
                 transform: scale(1.05);
@@ -380,7 +377,7 @@ defineExpose({
             font-size: 11px;
         }
     }
-    
+
     .info-icon {
         position: absolute;
         top: 10px;
@@ -398,17 +395,15 @@ defineExpose({
 @media screen and (max-width: 768px) {
     .search-container {
         padding: 10px;
-        
+
         .search-container-content {
             margin-top: 10px;
         }
-        
+
         .content-video {
             height: auto;
-            padding: 10px;
-            padding-left: 10px;
-            padding-bottom: 50px;
-            
+            padding: 10px 10px 50px;
+
             .content-video-img {
                 position: relative;
                 width: 100%;
@@ -417,12 +412,12 @@ defineExpose({
                 bottom: 0;
                 margin-bottom: 10px;
             }
-            
+
             .content-video-info {
                 position: relative;
                 padding-left: 0;
                 top: 0;
-                
+
                 .info-actions {
                     position: relative;
                     left: 0;
@@ -430,11 +425,11 @@ defineExpose({
                     margin-top: 10px;
                 }
             }
-            
+
             .content-video-bg {
                 display: none;
             }
         }
     }
 }
-</style> 
+</style>

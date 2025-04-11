@@ -19,28 +19,28 @@
         </div>
 
         <!-- 视频列表区域 -->
-        <video-item 
-            :channel="filters.channel.toString()" 
-            :type="filters.type || ''" 
-            :year="filters.year || ''" 
-            :area="filters.area || '日本'" 
-            :sort="filters.sort || 'addtime'" 
-            :limit="18" 
-            :page="1" 
-            :enablePagination="true" 
+        <video-item
+            :channel="filters.channel.toString()"
+            :type="filters.type || ''"
+            :year="filters.year || ''"
+            :area="filters.area || '日本'"
+            :sort="filters.sort || 'addtime'"
+            :limit="18"
+            :page="1"
+            :enablePagination="true"
             ref="videoItemRef"
         />
     </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { getChannelAPI } from '@/api/channel';
-import { Message } from '@arco-design/web-vue';
-import { globalConfig } from '@/utils/global-config';
+import {onMounted, ref, watch} from 'vue';
+import {useRoute} from 'vue-router';
+import {getChannelAPI} from '@/api/channel';
+import {Message} from '@arco-design/web-vue';
+import {globalConfig} from '@/utils/global-config';
 import VideoItem from '@/components/video-item/index.vue';
-import { IconCaretRight } from '@arco-design/web-vue/es/icon';
+import {IconCaretRight} from '@arco-design/web-vue/es/icon';
 
 const route = useRoute();
 
@@ -126,12 +126,12 @@ const initFilterData = async () => {
             // 读取URL参数设置初始值
             const queryChannel = route.query.channel ? parseInt(route.query.channel) : null;
             const querySort = route.query.sort || '';
-            
+
             // 设置默认值，优先使用URL参数
             filters.value.channel = queryChannel || channelData.value.data[0].id;
             filters.value.type = '';  // 默认选择全部
             filters.value.year = '';  // 默认选择全部
-            
+
             // 根据当前选中的频道获取默认地区
             const selectedChannel = channelData.value.data.find(item => item.id === filters.value.channel);
             if (selectedChannel) {
@@ -139,7 +139,7 @@ const initFilterData = async () => {
             } else {
                 filters.value.area = channelData.value.data[0].areas[0] || '';
             }
-            
+
             // 排序方式，优先使用URL参数
             filters.value.sort = querySort || 'addtime';  // 默认选择最新上线
         }
@@ -188,8 +188,7 @@ watch(
     () => route.query,
     (query) => {
         if (query.channel) {
-            const channelId = parseInt(query.channel);
-            filters.value.channel = channelId;
+            filters.value.channel = parseInt(query.channel);
         }
         if (query.sort) {
             filters.value.sort = query.sort;
@@ -300,4 +299,4 @@ defineExpose({
         }
     }
 }
-</style> 
+</style>

@@ -1,7 +1,7 @@
 <template>
     <div class="app-menu flex flex-column">
         <div class="menu-logo flex align-items" :class="activeIndex === 0 ? 'menu-top-radius' : ''">
-            <img src="@/assets/image/logo.jpg" class="menu-logo-img" />
+            <img src="@/assets/image/logo.jpg" class="menu-logo-img"  alt="logo"/>
         </div>
         <div class="menu-item flex align-center" v-for="(item, index) in filteredMenus" :key="index" :class="[
             activeIndex === index ? 'active' : '',
@@ -21,6 +21,7 @@
 import { ref, onMounted, computed, watch } from "vue";
 import { useRoute, useRouter } from 'vue-router';
 import { useCommonStore } from '@/stores/commonStore';
+import {IconArrowRight} from "@/components/icons/index.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -85,10 +86,7 @@ const menus = ref([
 const filteredMenus = computed(() => {
     return menus.value.filter(menu => {
         // 如果菜单项需要登录但用户未登录，则不显示该项
-        if (menu.meta.requiresLogin && !isLogin.value) {
-            return false;
-        }
-        return true;
+        return !(menu.meta.requiresLogin && !isLogin.value);
     });
 });
 
@@ -115,7 +113,7 @@ watch(
 onMounted(() => {
     // 初始化登录状态
     isLogin.value = commonStore.isLogin;
-    
+
     // 监听登录状态变化
     watch(
         () => commonStore.isLogin,
@@ -123,7 +121,7 @@ onMounted(() => {
             isLogin.value = newValue;
         }
     );
-    
+
     setActiveMenu();
 });
 
@@ -288,4 +286,4 @@ const goPath = (item, index) => {
         }
     }
 }
-</style> 
+</style>

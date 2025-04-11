@@ -1,10 +1,10 @@
 <template>
   <div class="video-player">
-    <ArtPlayer 
-      v-if="playerUrl" 
-      :video-id="videoId" 
-      :part="part" 
-      :play-type="playType" 
+    <ArtPlayer
+      v-if="playerUrl"
+      :video-id="videoId"
+      :part="part"
+      :play-type="playType"
       :url="playerUrl"
       @next-play="handleNextPlay"
     />
@@ -45,22 +45,22 @@ const getVideoUrl = async () => {
   try {
     // 重置播放地址
     playerUrl.value = '';
-    
+
     // 获取播放地址
     const res = await getVideoPlayAPI({
       id: props.videoId,
       play: props.playType,
       part: props.part,
     });
-    
+
     // 处理播放类型
-    let url = '';
+    let url;
     if (res.data.type === "multi") {
       url = res.data.url.multi[0].url;
     } else {
       url = res.data.url.single;
     }
-    
+
     // 处理m3u8格式
     if (url.toString().includes(".m3u8")) {
       // 判断URL地址是否为HTTPS
@@ -128,4 +128,4 @@ onMounted(() => {
     color: #fff;
   }
 }
-</style> 
+</style>

@@ -2,9 +2,9 @@
     <div class="video-page" v-if="detail">
         <div class="main-content">
             <div class="video-container">
-                <VideoPlayer 
+                <VideoPlayer
                     v-if="isPlayerReady"
-                    :video-id="route.params.id.toString()" 
+                    :video-id="route.params.id.toString()"
                     :part="currentEpisode"
                     :play-type="currentPlayType"
                     @next-play="handleNextEpisode"
@@ -30,17 +30,17 @@
                 </div>
                 <!-- 侧边栏内容，根据折叠状态显示或隐藏 -->
                 <div class="sidebar-content" :class="{ 'collapsed': isMobileSidebarCollapsed }">
-                    <VideoSidebar 
-                        v-if="detail" 
-                        :title="detail.name" 
-                        :year="detail.year" 
+                    <VideoSidebar
+                        v-if="detail"
+                        :title="detail.name"
+                        :year="detail.year"
                         :region="detail.area"
-                        :type="detail.type" 
-                        :parts="detail.parts" 
+                        :type="detail.type"
+                        :parts="detail.parts"
                         :current-episode="currentEpisode"
-                        :current-play-type="currentPlayType" 
+                        :current-play-type="currentPlayType"
                         :content="detail.content"
-                        @episode-change="handleEpisodeChange" 
+                        @episode-change="handleEpisodeChange"
                     />
                 </div>
             </div>
@@ -49,22 +49,22 @@
         </div>
         <div class="side-content" v-if="!isMobile">
             <div class="sidebar-container">
-                <VideoSidebar 
-                    v-if="detail" 
-                    :title="detail.name" 
-                    :year="detail.year" 
+                <VideoSidebar
+                    v-if="detail"
+                    :title="detail.name"
+                    :year="detail.year"
                     :region="detail.area"
-                    :type="detail.type" 
-                    :parts="detail.parts" 
+                    :type="detail.type"
+                    :parts="detail.parts"
                     :current-episode="currentEpisode"
-                    :current-play-type="currentPlayType" 
+                    :current-play-type="currentPlayType"
                     :content="detail.content"
-                    @episode-change="handleEpisodeChange" 
+                    @episode-change="handleEpisodeChange"
                 />
             </div>
             <div class="related-container">
-                <RelatedVideos 
-                    :channel="detail?.cid.toString()" 
+                <RelatedVideos
+                    :channel="detail?.cid.toString()"
                     :limit="6"
                     :sort="`hits`"
                 />
@@ -74,13 +74,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { getVideoDetailAPI } from '@/api/video';
 import { useCommonStore } from '@/stores/commonStore';
 import { IconUp, IconDown } from '@arco-design/web-vue/es/icon';
-import VideoItem from '@/components/video-item/index.vue';
 import VideoPlayer from './components/VideoPlayer.vue';
 import VideoSidebar from './components/VideoSidebar.vue';
 import RelatedVideos from './components/RelatedVideos.vue';
@@ -104,12 +103,12 @@ const getVideoDetail = async () => {
         const res = await getVideoDetailAPI({
             "id": route.params.id.toString()
         });
-        
+
         if (res.data) {
             detail.value = res.data.data;
             // 设置SEO相关内容
             document.title = `正在播放【${detail.value?.name}】- Jocy动漫`;
-            
+
             // 检查 URL 中是否存在 part 参数
             const urlPart = route.query.part;
             if (urlPart && detail.value?.parts.some(part => part.part && part.part.includes(urlPart.toString()))) {
@@ -125,7 +124,7 @@ const getVideoDetail = async () => {
             } else {
                 console.error('未找到有效的剧集信息');
             }
-            
+
             // 确保两个参数都有值后，才设置播放器为就绪状态
             if (currentEpisode.value && currentPlayType.value) {
                 isPlayerReady.value = true;
@@ -144,15 +143,15 @@ const getVideoDetail = async () => {
 const handleEpisodeChange = (episode, playType) => {
     // 先将播放器设为未就绪状态
     isPlayerReady.value = false;
-    
+
     // 设置新的剧集和播放类型
     currentEpisode.value = episode;
     currentPlayType.value = playType;
-    
+
     // 更新URL参数但不刷新页面
     const query = { ...route.query, part: episode };
     router.push({ query });
-    
+
     // 确保参数设置完成后，将播放器设为就绪状态
     if (currentEpisode.value && currentPlayType.value) {
         isPlayerReady.value = true;
@@ -162,15 +161,15 @@ const handleEpisodeChange = (episode, playType) => {
 // 处理播放下一集
 const handleNextEpisode = () => {
     if (!detail.value?.parts) return;
-    
+
     // 查找当前播放线路
     const currentPart = detail.value.parts.find(part => part.play === currentPlayType.value);
     if (!currentPart?.part) return;
-    
+
     // 查找当前剧集的索引
     const currentIndex = currentPart.part.findIndex(episode => episode === currentEpisode.value);
     if (currentIndex === -1 || currentIndex >= currentPart.part.length - 1) return;
-    
+
     // 播放下一集
     handleEpisodeChange(currentPart.part[currentIndex + 1], currentPlayType.value);
 };
@@ -231,14 +230,14 @@ onMounted(() => {
             justify-content: center;
             align-items: center;
             color: #fff;
-            
+
             :deep(.arco-result) {
                 background: transparent;
-                
+
                 .arco-result-title {
                     color: #fff;
                 }
-                
+
                 .arco-result-subtitle {
                     color: rgba(255, 255, 255, 0.7);
                 }
@@ -318,4 +317,4 @@ onMounted(() => {
         }
     }
 }
-</style> 
+</style>

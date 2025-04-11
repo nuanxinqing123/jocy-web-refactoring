@@ -1,19 +1,19 @@
 <template>
     <div class="search-container flex align-center content-between">
         <a-input placeholder="搜索番剧" v-model="searchValue"
-            :class="isMobile ? 'flex-base search' : 'search navbar-search'" 
+            :class="isMobile ? 'flex-base search' : 'search navbar-search'"
             @input="handleSearchInput"
-            @press-enter="handleSearch" 
-            @blur="searchBlur" 
+            @press-enter="handleSearch"
+            @blur="searchBlur"
             autocomplete="off">
             <template #suffix>
                 <icon-search @click="handleSearch" size="20" class="theme-icon p-pointer" />
             </template>
         </a-input>
         <div class="search-containerh-recommend" v-if="searchItems.length && !isMobile">
-            <div 
+            <div
                 class="recommend-item flex align-center"
-                v-for="item in searchItems" 
+                v-for="item in searchItems"
                 :key="item.id"
                 @click="handleRecommendItemClick(item)"
             >
@@ -30,6 +30,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { getVideoKey } from "@/api/video";
 import { Message } from "@arco-design/web-vue";
 import { useCommonStore } from '@/stores/commonStore';
+import {IconSearch} from "@/components/icons/index.js";
 
 const router = useRouter();
 const route = useRoute();
@@ -70,7 +71,7 @@ const handleSearchInput = async (value) => {
     if (isMobile.value) {
         return;
     }
-    
+
     // PC端执行快捷检索
     await searchChange(value);
 };
@@ -80,7 +81,7 @@ const searchChange = async (value) => {
         searchItems.value = [];
         return;
     }
-    
+
     try {
         const response = await getVideoKey({
             key: value,
@@ -91,7 +92,7 @@ const searchChange = async (value) => {
         // 处理响应数据
         if (response && response.data) {
             let videoData;
-            
+
             // 处理不同的数据结构
             if (typeof response.data === 'string') {
                 videoData = JSON.parse(response.data);
@@ -119,7 +120,7 @@ const searchChange = async (value) => {
             if (items && items.length > 0) {
                 searchItems.value = items.map((item) => {
                     if (typeof item.name === 'string') {
-                        item.nameAll = item.name.replace(new RegExp(value, 'gi'), match => 
+                        item.nameAll = item.name.replace(new RegExp(value, 'gi'), match =>
                             `<span class='theme-color'>${match}</span>`);
                     } else {
                         item.nameAll = item.name || '';
@@ -227,4 +228,4 @@ onMounted(() => {
         }
     }
 }
-</style> 
+</style>

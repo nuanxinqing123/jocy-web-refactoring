@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getBannerAPI } from '@/api/video';
 import { useCommonStore } from '@/stores/commonStore';
 import { handleImage } from '@/utils/image';
@@ -49,7 +49,7 @@ const commonStore = useCommonStore();
 const getCarousel = async () => {
   try {
     const res = await getBannerAPI(props.id);
-    
+
     // 检查响应是否有效
     if (res && res.data) {
         banner.value = res.data.data;
@@ -176,4 +176,4 @@ onMounted(() => {
     }
   }
 }
-</style> 
+</style>

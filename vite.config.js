@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vitePluginBundleObfuscator from "vite-plugin-bundle-obfuscator";
-import path from 'path'
+// import vitePluginBundleObfuscator from "vite-plugin-bundle-obfuscator";
 import { fileURLToPath } from 'url'
 
 // https://vite.dev/config/

@@ -42,13 +42,13 @@ const initPlayer = () => {
     art.destroy();
     art = null;
   }
-  
+
   // 检测是否为移动端设备
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
+
   // 获取播放历史时间点
   const startTime = getPlayTime();
-  
+
   // 播放器配置
   const options = {
     container: artPlayerRef.value,
@@ -81,21 +81,21 @@ const initPlayer = () => {
       'webkit-playsinline': true
     },
     icons: {
-      loading: '<img src="https://artplayer.org/assets/img/ploading.gif">',
-      state: '<img width="150" heigth="150" src="https://artplayer.org/assets/img/state.svg">',
+      loading: '<img src="https://artplayer.org/assets/img/ploading.gif" alt="loading">',
+      state: '<img width="150" height="150" src="https://artplayer.org/assets/img/state.svg" alt="state">',
     },
     customType: {},
   };
-  
+
   // 创建播放器实例
   art = new Artplayer(options);
-  
+
   // 监听播放器事件
   art.on('ready', () => {
     if (startTime > 0) {
       art.seek = startTime;
     }
-    
+
     // 记录播放历史初始点（0）
     postHistoryAPI({
       vid: Number(props.videoId),
@@ -104,23 +104,23 @@ const initPlayer = () => {
       time_point: 0
     }).catch(err => console.error('初始播放记录保存失败', err));
   });
-  
+
   // 监听播放状态
   art.on('play', () => {
     startTimeTracking();
   });
-  
+
   art.on('pause', () => {
     clearTimeTracking();
   });
-  
+
   // 监听播放结束
   art.on('ended', () => {
     clearTimeTracking();
     // 通知父组件播放下一集
     emit('nextPlay', true);
   });
-  
+
   // 监听错误
   art.on('error', (error) => {
     console.error('播放器错误:', error);
@@ -131,7 +131,7 @@ const initPlayer = () => {
 const getPlayTime = () => {
   const historyList = commonStore.historyList || [];
   const currentHistory = historyList.find(
-    (item) => 
+    (item) =>
       Number(item.vid) === Number(props.videoId) &&
       item.part === props.part
   );
@@ -141,18 +141,18 @@ const getPlayTime = () => {
 // 开始时间跟踪
 const startTimeTracking = () => {
   clearTimeTracking(); // 确保不会有重复的定时器
-  
+
   timeInterval = setInterval(() => {
     secondCounter.value += 1;
     if (!art) return;
-    
+
     const currentTime = Math.floor(art.currentTime);
     const isFastForward = currentTime - currentPlayTime.value > 2;
     currentPlayTime.value = currentTime;
-    
+
     // 更新本地历史记录
     updateLocalHistory(currentTime);
-    
+
     // 每60秒或快进时保存到服务器
     if (secondCounter.value % 60 === 0 || isFastForward) {
       saveHistoryToServer(currentTime);
@@ -174,11 +174,11 @@ const updateLocalHistory = (currentTime) => {
   try {
     const historyList = [...(commonStore.historyList || [])];
     const historyIndex = historyList.findIndex(
-      (item) => 
-        Number(item.vid) === Number(props.videoId) && 
+      (item) =>
+        Number(item.vid) === Number(props.videoId) &&
         item.part === props.part
     );
-    
+
     if (historyIndex !== -1) {
       historyList[historyIndex].time_point = currentTime;
     } else {
@@ -189,7 +189,7 @@ const updateLocalHistory = (currentTime) => {
         time_point: currentTime
       });
     }
-    
+
     commonStore.setHistoryList(historyList);
   } catch (error) {
     console.error('更新本地历史记录失败', error);
@@ -237,4 +237,4 @@ onBeforeUnmount(() => {
   height: 100%;
   background-color: #000;
 }
-</style> 
+</style>
