@@ -1,4 +1,16 @@
 <template>
+    <a-alert
+        v-if="showWarning"
+        style="max-width: 1400px; margin: 0 auto;"
+        closable
+        type="warning"
+        :show-icon="false"
+        @close="handleCloseWarning">
+        <template #title>
+            Warning
+        </template>
+        如果遇到播放不了，请尝试更换浏览器或者更换播放设备尝试[推荐Chrome浏览器]。其他问题请加入群组反馈。
+    </a-alert>
     <div class="video-page" v-if="detail">
         <div class="main-content">
             <div class="video-container">
@@ -96,6 +108,13 @@ const currentEpisode = ref('');
 const currentPlayType = ref('');
 const isPlayerReady = ref(false);
 const isMobileSidebarCollapsed = ref(true);
+const showWarning = ref(true);
+
+// 处理警告关闭
+const handleCloseWarning = () => {
+    showWarning.value = false;
+    localStorage.setItem('videoWarningClosed', 'true');
+};
 
 // 获取视频详情
 const getVideoDetail = async () => {
@@ -185,6 +204,10 @@ watch(
 );
 
 onMounted(() => {
+    // 检查本地存储中是否已关闭警告
+    if (localStorage.getItem('videoWarningClosed') === 'true') {
+        showWarning.value = false;
+    }
     getVideoDetail();
 });
 </script>

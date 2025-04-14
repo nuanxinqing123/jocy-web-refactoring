@@ -302,7 +302,6 @@ onBeforeUnmount(() => {
   background-color: #fff;
   border-radius: 12px;
   padding: 16px;
-  margin-top: 20px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 
   .comment-navigation {

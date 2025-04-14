@@ -45,8 +45,9 @@
                     v-model:current="pagination.currentPage"
                     :total="pagination.total"
                     :page-size="pagination.pageSize"
-                    show-total
-                    show-jumper
+                    :show-total="!isMobile"
+                    :show-jumper="!isMobile"
+                    :size="isMobile ? 'small' : 'medium'"
                     @change="handlePageChange"
                 />
             </div>
@@ -171,6 +172,10 @@ onMounted(() => {
     padding: 20px;
     padding-top: 0;
     
+    @media screen and (max-width: 768px) {
+        padding: 10px;
+    }
+    
     .page-title {
         font-size: 20px;
         font-weight: 600;
@@ -178,6 +183,12 @@ onMounted(() => {
         color: #333;
         padding-bottom: 15px;
         border-bottom: 1px solid #eee;
+        
+        @media screen and (max-width: 768px) {
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
     }
     
     .content-box {
@@ -186,6 +197,15 @@ onMounted(() => {
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         min-height: 300px;
+        
+        @media screen and (max-width: 768px) {
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        @media screen and (max-width: 480px) {
+            padding: 10px;
+        }
     }
 
     .loading-container, .empty-container {
@@ -203,12 +223,12 @@ onMounted(() => {
         
         @media screen and (max-width: 768px) {
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 12px;
         }
         
         @media screen and (max-width: 480px) {
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
     }
 
@@ -258,11 +278,20 @@ onMounted(() => {
                 font-size: 12px;
                 border-top-right-radius: 4px;
                 border-bottom-right-radius: 4px;
+                
+                @media screen and (max-width: 480px) {
+                    font-size: 10px;
+                    padding: 3px 6px;
+                }
             }
         }
 
         .video-info {
             padding: 10px;
+            
+            @media screen and (max-width: 480px) {
+                padding: 8px;
+            }
 
             .video-title {
                 font-size: 16px;
@@ -277,6 +306,15 @@ onMounted(() => {
                 white-space: normal;
                 word-break: break-all;
                 text-overflow: ellipsis;
+                
+                @media screen and (max-width: 768px) {
+                    font-size: 14px;
+                }
+                
+                @media screen and (max-width: 480px) {
+                    font-size: 12px;
+                    margin-bottom: 3px;
+                }
             }
 
             .video-update, .video-progress {
@@ -284,6 +322,11 @@ onMounted(() => {
                 color: #999;
                 margin: 0 0 5px;
                 line-height: 1.4;
+                
+                @media screen and (max-width: 480px) {
+                    font-size: 10px;
+                    margin-bottom: 3px;
+                }
             }
             
             .video-progress {
@@ -296,6 +339,11 @@ onMounted(() => {
             padding: 0 10px 10px;
             flex-wrap: wrap;
             gap: 10px;
+            
+            @media screen and (max-width: 480px) {
+                padding: 0 8px 8px;
+                gap: 6px;
+            }
 
             .action-btn {
                 flex: 1;
@@ -310,6 +358,19 @@ onMounted(() => {
                 transition: all 0.2s;
                 border: none;
                 outline: none;
+                
+                @media screen and (max-width: 768px) {
+                    min-width: 60px;
+                    height: 30px;
+                    font-size: 12px;
+                }
+                
+                @media screen and (max-width: 480px) {
+                    min-width: 40px;
+                    height: 26px;
+                    font-size: 10px;
+                    border-radius: 20px;
+                }
 
                 &.play-btn {
                     background: linear-gradient(135deg, #f596aa 0%, #f28b82 100%);
@@ -338,6 +399,10 @@ onMounted(() => {
         margin-top: 30px;
         display: flex;
         justify-content: center;
+        
+        @media screen and (max-width: 768px) {
+            margin-top: 20px;
+        }
     }
 }
 </style> 
