@@ -55,6 +55,7 @@ const getVideoUrl = async () => {
     }
 
     // 获取播放地址
+    // https://v3.douyinvod.com/7436333fa505bb3b481a21f9dc2547c6/67fc9ec7/video/tos/cn/tos-cn-v-6643b4/oUEBUDnM9iOFXlwzDAEM58FzL4SBsgffE12KOS/
     const res = await getVideoPlayAPI({
       id: props.videoId,
       play: props.playType,
@@ -69,24 +70,25 @@ const getVideoUrl = async () => {
       url = res.data.url.single;
     }
     
+    playerUrl.value = url;
 
-    // 处理m3u8格式
-    if (url.toString().includes(".m3u8")) {
-      // 判断URL地址是否为HTTPS
-      if (url.toString().includes("https://")) {
-        playerUrl.value = url;
-      } else {
-        // 需要转换非https的m3u8
-        const m3u8Res = await postPlayResourcesAPI(url);
-        // string转换为m3u8文件
-        const blob = new Blob([m3u8Res.data]);
-        // 创建虚拟URL
-        playerUrl.value = URL.createObjectURL(blob);
-      }
-    } else {
-      // 直接使用非m3u8地址
-      playerUrl.value = url;
-    }
+    // // 处理m3u8格式
+    // if (url.toString().includes(".m3u8")) {
+    //   // 判断URL地址是否为HTTPS
+    //   if (url.toString().includes("https://")) {
+    //     playerUrl.value = url;
+    //   } else {
+    //     // 需要转换非https的m3u8
+    //     const m3u8Res = await postPlayResourcesAPI(url);
+    //     // string转换为m3u8文件
+    //     const blob = new Blob([m3u8Res.data]);
+    //     // 创建虚拟URL
+    //     playerUrl.value = URL.createObjectURL(blob);
+    //   }
+    // } else {
+    //   // 直接使用非m3u8地址
+    //   playerUrl.value = url;
+    // }
   } catch (error) {
     console.error('获取视频播放地址失败:', error);
   }
