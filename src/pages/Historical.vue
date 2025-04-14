@@ -61,6 +61,7 @@ import { Message } from '@arco-design/web-vue';
 import { getHistoryList } from '@/api/video';
 import { handleImage } from '@/utils/image';
 import { useCommonStore } from '@/stores/commonStore';
+import {globalConfig} from '@/utils/global-config';
 import { IconPlayCircle, IconHistory } from '@arco-design/web-vue/es/icon';
 
 const router = useRouter();
@@ -159,6 +160,7 @@ defineExpose({
 });
 
 onMounted(() => {
+    document.title = `观看历史 - ${globalConfig.title}`;
     // 初始化加载历史记录列表
     fetchHistoryList();
 });

@@ -63,6 +63,7 @@ import { Message } from '@arco-design/web-vue';
 import { getCollectList, delCollect } from '@/api/video';
 import { handleImage } from '@/utils/image';
 import { useCommonStore } from '@/stores/commonStore';
+import {globalConfig} from '@/utils/global-config';
 import { IconPlayCircle, IconDelete, IconHeartFill } from '@arco-design/web-vue/es/icon';
 
 const router = useRouter();
@@ -142,6 +143,7 @@ defineExpose({
 });
 
 onMounted(() => {
+    document.title = `我的收藏 - ${globalConfig.title}`;
     // 初始化加载收藏列表
     fetchCollectList();
 });
