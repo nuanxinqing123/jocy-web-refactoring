@@ -7,6 +7,7 @@ import './assets/style/main.less'
 import App from './App.vue'
 import ArcoVue from '@arco-design/web-vue';
 import IconComponents from './components/icons'
+import Vconsole from 'vconsole'
 
 // 创建Pinia实例
 const pinia = createPinia()
@@ -66,6 +67,10 @@ app.use(pinia)
 app.use(router)
 app.use(ArcoVue)
 app.use(IconComponents)
+if (process.env.NODE_ENV !== 'production') { // 测试和开发打开，生产不能打开
+  let vConsole = new Vconsole()
+  app.use(vConsole)
+}
 
 // 挂载应用
 app.mount('#app')
