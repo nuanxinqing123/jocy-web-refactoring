@@ -143,6 +143,15 @@ const menus = ref([
             icon: "icon-link",
         },
     },
+    {
+        path: "https://qm.qq.com/q/qi60FX7AiY",
+        name: "link",
+        meta: {
+            locale: "QQ群组",
+            requiresAuth: true,
+            icon: "icon-link",
+        },
+    }
 ]);
 
 // 过滤菜单项，根据登录状态
