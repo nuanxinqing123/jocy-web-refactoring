@@ -57,7 +57,7 @@ const menus = ref([
         path: "/collect",
         name: "collect",
         meta: {
-            locale: "收藏",
+            locale: "我的收藏",
             icon: "icon-heart",
             requiresLogin: true,
         },
@@ -66,7 +66,7 @@ const menus = ref([
         path: "/historical",
         name: "historical",
         meta: {
-            locale: "历史记录",
+            locale: "观看历史",
             icon: "icon-history",
             requiresLogin: true,
         },
