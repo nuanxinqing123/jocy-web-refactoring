@@ -477,9 +477,5 @@ onBeforeUnmount(() => {
 .art-player-container {
     width: 100%;
     height: 100%;
-
-    .art-video-player {
-        height: 100% !important;
-    }
 }
 </style>

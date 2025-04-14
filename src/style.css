@@ -154,3 +154,6 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+.art-video-player {
+    height: 100% !important;
+}
