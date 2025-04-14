@@ -11,6 +11,13 @@
     <div v-else class="loading-container">
       <a-spin :size="40" tip="加载中..." />
     </div>
+    
+    <!-- H265不支持提示 -->
+    <div v-if="!supportH265 && isH265Video" class="h265-unsupported-tip">
+      <a-alert type="warning" show-icon>
+        <template #message>当前浏览器不支持播放H265视频，请更换其他浏览器或播放设备。</template>
+      </a-alert>
+    </div>
   </div>
 </template>
 
@@ -40,6 +47,33 @@ const emit = defineEmits(['next-play']);
 const route = useRoute();
 const router = useRouter();
 const playerUrl = ref('');
+const supportH265 = ref(false);
+const isH265Video = ref(false);
+
+// 检测浏览器是否支持H265
+const checkH265Support = () => {
+  // 检测MediaSource Extensions对HEVC的支持
+  if (window.MediaSource) {
+    try {
+      const isHevcSupported = MediaSource.isTypeSupported('video/mp4; codecs="hev1.1.6.L93.B0"') ||
+                            MediaSource.isTypeSupported('video/mp4; codecs="hvc1.1.6.L93.B0"');
+      supportH265.value = isHevcSupported;
+    } catch (e) {
+      supportH265.value = false;
+    }
+  } else {
+    supportH265.value = false;
+  }
+  
+  // 使用视频元素检测
+  if (!supportH265.value) {
+    const video = document.createElement('video');
+    supportH265.value = video.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"') === 'probably' ||
+                       video.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') === 'probably';
+  }
+  
+  console.log('浏览器H265支持状态:', supportH265.value);
+};
 
 // 获取视频播放地址
 const getVideoUrl = async () => {
@@ -71,6 +105,13 @@ const getVideoUrl = async () => {
     }
     
     playerUrl.value = url;
+    
+    // 判断是否为H265视频
+    // 这里假设视频编码信息可以从响应中获取，如果不能，可能需要根据实际情况调整
+    // 例如：根据URL特征或响应中的其他信息来判断
+    isH265Video.value = res.data.codec === 'h265' || 
+                        (res.data.info && res.data.info.indexOf('hevc') > -1) ||
+                        (res.data.info && res.data.info.indexOf('h265') > -1);
 
     // // 处理m3u8格式
     // if (url.toString().includes(".m3u8")) {
@@ -114,6 +155,7 @@ watch(
 );
 
 onMounted(() => {
+  checkH265Support();
   if (props.videoId && props.part && props.playType) {
     getVideoUrl();
   }
@@ -137,6 +179,16 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     color: #fff;
+  }
+  
+  .h265-unsupported-tip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10;
   }
 }
 </style>
