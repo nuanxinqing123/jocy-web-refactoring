@@ -9,7 +9,7 @@
 
         <div class="input-group">
             <!-- 用户名输入框 -->
-            <a-input v-model="registerForm.username" placeholder="请输入用户名" @blur="validateUsername"
+            <a-input v-model="registerForm.user_name" placeholder="请输入用户名" @blur="validateUsername"
                 :style="{ marginBottom: usernameError ? '5px' : '20px' }">
                 <template #prefix>
                     <icon-user />
@@ -85,7 +85,7 @@ const countdown = ref(0);
 
 // 注册表单数据
 const registerForm = ref({
-    username: '',
+    user_name: '',
     imageCaptcha: '',
     contact: '',
     verificationCode: '',
@@ -168,7 +168,7 @@ const sendVerificationCode = () => {
 
 // 表单验证
 const validateUsername = () => {
-    if (!registerForm.value.username) {
+    if (!registerForm.value.user_name) {
         usernameError.value = '用户名不能为空';
         return false;
     }
@@ -225,8 +225,9 @@ const handleRegister = async () => {
     try {
         // 调用注册接口
         const res = await postRegisterAPI({
-            username: registerForm.value.contact,
-            user_name: registerForm.value.username,
+            phone: registerForm.value.contact,
+            email: registerForm.value.contact,
+            user_name: registerForm.value.user_name,
             sms_code: registerForm.value.verificationCode,
             password: registerForm.value.password,
             enum: isEmail.value ? 1 : 0
@@ -521,4 +522,4 @@ refreshCaptcha();
         transform: translate(100%, 100%) rotate(30deg);
     }
 }
-</style> 
+</style>
