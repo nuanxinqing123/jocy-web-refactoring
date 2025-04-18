@@ -1,17 +1,24 @@
 <template>
     <footer class="footer-bottom">
         <div class="footer-content container">
-            <div class="footer-links">
-                <a href="https://t.me/jocyweb" target="_blank" class="footer-link">
-                    <i class="footer-icon telegram-icon"></i>Telegram群组
+            <!-- <div class="footer-links">
+                <router-link to="/" class="footer-link flash-view">
+                    <span class="footer-link-text">首页</span>
+                </router-link>
+                <span class="divider">|</span>
+                <router-link to="/about" class="footer-link flash-view">
+                    <span class="footer-link-text">关于我们</span>
+                </router-link>
+                <span class="divider">|</span>
+                <router-link to="/feedback" class="footer-link flash-view">
+                    <span class="footer-link-text">意见反馈</span>
+                </router-link>
+                <span class="divider">|</span>
+                <a href="mailto:contact@jocy.com" class="footer-link flash-view">
+                    <i class="footer-icon email-icon"></i>
+                    <span class="footer-link-text">联系我们</span>
                 </a>
-                <span class="divider">|</span>
-                <a href="#" class="footer-link">关于我们</a>
-                <span class="divider">|</span>
-                <a href="#" class="footer-link">使用条款</a>
-                <span class="divider">|</span>
-                <a href="#" class="footer-link">隐私政策</a>
-            </div>
+            </div> -->
             <div class="footer-copyright">
                 本站只提供WEB页面服务，本站不存储、不制作任何视频，不承担任何由于内容的合法性及健康性所引起的争议和法律责任。若本站收录内容侵犯了您的权益，请附说明，
                 并通过网站反馈联系处理。
@@ -30,20 +37,21 @@ const currentYear = new Date().getFullYear();
 
 <style scoped lang="less">
 .footer-bottom {
-    background-color: #f8f9fa;
+    background-color: var(--color-bg);
     padding: 30px 0;
-    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05);
-    margin-top: 40px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+    margin-top: 50px;
+    border-top: 1px solid var(--color-border);
 }
 
 .footer-content {
     margin: 0 auto;
     max-width: 1200px;
-    padding: 0 15px;
+    padding: 0 20px;
     
     // 响应式设计
     @media (max-width: 768px) {
-        padding: 0 20px;
+        padding: 0 16px;
     }
 }
 
@@ -51,39 +59,56 @@ const currentYear = new Date().getFullYear();
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     
     @media (max-width: 576px) {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
         
         .divider {
             display: none;
         }
         
         .footer-link {
-            margin: 5px 0;
+            margin: 5px 8px;
         }
     }
 }
 
 .footer-link {
-    color: #666;
-    margin: 0 10px;
+    color: var(--color-text-light);
+    margin: 0 12px;
     transition: all 0.3s ease;
     font-size: 14px;
     text-decoration: none;
     display: flex;
     align-items: center;
+    position: relative;
     
     &:hover {
-        color: #f596aa;
+        color: var(--color-primary);
         transform: translateY(-2px);
+    }
+    
+    &:after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--color-primary);
+        transition: width 0.3s ease;
+    }
+    
+    &:hover:after {
+        width: 100%;
     }
 }
 
 .footer-icon {
-    margin-right: 5px;
+    margin-right: 6px;
     width: 16px;
     height: 16px;
     background-size: contain;
@@ -91,50 +116,65 @@ const currentYear = new Date().getFullYear();
     background-position: center;
 }
 
-.telegram-icon {
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzY2NiIgZD0iTTkuNzgsMTguNjVMMTAuMDYsMTQuNDJMMTcuNzQsNy41QzE4LjA4LDcuMTkgMTcuNjcsNy4wNCAxNy4yMiw3LjMxTDcuNzQsMTMuM0wzLjY0LDEyQzIuNzYsMTEuNzUgMi43NSwxMS4xNCAzLjg0LDEwLjdMMTkuODEsNC41NEMyMC41NCw0LjIxIDIxLjI0LDQuNzIgMjAuOTYsNS44NEwxOC4yNCwxOC42NUMxOC4wNSwxOS41NiAxNy41LDE5Ljc4IDE2Ljc0LDE5LjM2TDEyLjYsMTYuM0wxMC42MSwxOC4yM0MxMC4zOCwxOC40NiAxMC4xOSwxOC42NSA5Ljc4LDE4LjY1WiIvPjwvc3ZnPg==');
+.email-icon {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzY2NiIgZD0iTTIwLDhMMTIsMTNMNCw4VjZMMTIsMTFMMjAsNk04LDlIMTBWMTNIOFY5TTEwLDE0SDhWMTZIMTBWMTRNMTIsMTNIOE0xNCw5SDEyVjEzSDE0VjlNMTQsMTRIMTJWMTZIMTRWMTRNMTYsOUgxNFY2SDE2VjlMMTYsOVoiLz48L3N2Zz4=');
 }
 
 .divider {
-    color: #ddd;
+    color: var(--color-border);
     margin: 0 5px;
+    
+    @media (max-width: 576px) {
+        display: none;
+    }
 }
 
 .footer-copyright {
-    color: #999;
-    margin-bottom: 15px;
+    color: var(--color-text-lighter);
+    margin-bottom: 20px;
     font-size: 13px;
-    line-height: 1.6;
+    line-height: 1.7;
     text-align: center;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     padding: 0 15px;
+    
+    @media (max-width: 576px) {
+        font-size: 12px;
+        line-height: 1.6;
+        padding: 0 10px;
+    }
 }
 
 .footer-icp {
-    color: #666;
+    color: var(--color-text-light);
     font-size: 14px;
     text-align: center;
     padding-top: 15px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--color-border);
     margin-top: 15px;
 }
 
 .copyright-text {
     font-size: 13px;
-    color: #888;
+    color: var(--color-text-lighter);
     position: relative;
     display: inline-block;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        color: var(--color-primary);
+    }
     
     &:after {
         content: '';
         position: absolute;
-        bottom: -5px;
+        bottom: -3px;
         left: 50%;
         width: 0;
         height: 1px;
-        background-color: #f596aa;
+        background-color: var(--color-primary);
         transition: all 0.3s ease;
         transform: translateX(-50%);
     }
