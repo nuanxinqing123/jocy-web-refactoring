@@ -396,6 +396,22 @@ const startTimeTracking = () => {
         if (secondCounter.value % 60 === 0 || isFastForward) {
             saveHistoryToServer(currentTime);
         }
+
+        // --------------------- 弹幕自动续拉核心逻辑 ----------------------
+        // 检查当前播放时间与已加载弹幕区间的最大end的距离
+        if (loadedTimeRanges.length > 0) {
+            // 找到已加载弹幕区间的最大end
+            const maxEnd = Math.max(...loadedTimeRanges.map(r => r.end));
+            // 当前播放时间（毫秒）与最大end的距离
+            const remain = maxEnd / 1000 - currentTime;
+            // 如果距离小于10秒，则自动加载后续60秒弹幕
+            if (remain < 10 && !loadingDanmuku) {
+                // 加载后续弹幕
+                loadDanmuku(maxEnd / 1000, maxEnd / 1000 + 60);
+                lastLoadTime = maxEnd / 1000;
+            }
+        }
+        // -----------------------------------------------------------------
     }, 1000);
 };
 
