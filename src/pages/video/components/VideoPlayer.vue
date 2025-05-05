@@ -52,27 +52,28 @@ const isH265Video = ref(false);
 
 // 检测浏览器是否支持H265
 const checkH265Support = () => {
+  let mseSupport = false;
+  let elementSupport = false;
+  
   // 检测MediaSource Extensions对HEVC的支持
   if (window.MediaSource) {
     try {
-      const isHevcSupported = MediaSource.isTypeSupported('video/mp4; codecs="hev1.1.6.L93.B0"') ||
-                            MediaSource.isTypeSupported('video/mp4; codecs="hvc1.1.6.L93.B0"');
-      supportH265.value = isHevcSupported;
+      mseSupport = MediaSource.isTypeSupported('video/mp4; codecs="hev1.1.6.L93.B0"') ||
+                   MediaSource.isTypeSupported('video/mp4; codecs="hvc1.1.6.L93.B0"');
     } catch (e) {
-      supportH265.value = false;
+      mseSupport = false;
     }
-  } else {
-    supportH265.value = false;
   }
   
   // 使用视频元素检测
-  if (!supportH265.value) {
-    const video = document.createElement('video');
-    supportH265.value = video.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"') === 'probably' ||
-                       video.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') === 'probably';
-  }
+  const video = document.createElement('video');
+  elementSupport = video.canPlayType('video/mp4; codecs="hev1.1.6.L93.B0"') === 'probably' ||
+                   video.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') === 'probably';
   
-  console.log('浏览器H265支持状态:', supportH265.value);
+  // 两种方法都要通过才确认支持H265
+  supportH265.value = mseSupport && elementSupport;
+  
+  console.log('浏览器H265支持状态:', supportH265.value, '(MSE支持:', mseSupport, ', 元素支持:', elementSupport, ')');
 };
 
 // 获取视频播放地址

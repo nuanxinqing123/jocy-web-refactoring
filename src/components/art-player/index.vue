@@ -40,6 +40,8 @@ let timeInterval = null;
 let lastLoadTime = 0;
 let loadingDanmuku = false;
 let loadedTimeRanges = [];
+// 创建一个临时的弹幕ID集合，用于去重
+let loadedDanmuIds = new Set();
 
 // 获取弹幕数据
 const getDanmuData = async (startTime, endTime) => {
@@ -59,6 +61,11 @@ const getDanmuData = async (startTime, endTime) => {
             // 处理弹幕数据
             return res.data.data.items.map(item => {
                 try {
+                    // 检查弹幕ID是否已经加载过，如果加载过则跳过
+                    if (loadedDanmuIds.has(item.id)) {
+                        return null;
+                    }
+                    
                     let contentObj;
                     try {
                         // 尝试解析JSON内容
@@ -67,6 +74,11 @@ const getDanmuData = async (startTime, endTime) => {
                         // JSON解析失败，使用默认值
                         console.warn('弹幕内容JSON解析失败:', parseError);
                         contentObj = { content: item.content, color: 4294967295 }; // 默认白色
+                    }
+
+                    // 将弹幕ID添加到已加载列表
+                    if (item.id) {
+                        loadedDanmuIds.add(item.id);
                     }
 
                     // 转换弹幕格式为artplayer-plugin-danmuku需要的格式
@@ -81,7 +93,7 @@ const getDanmuData = async (startTime, endTime) => {
                     console.error('处理弹幕项目失败:', itemError);
                     return null;
                 }
-            }).filter(item => item !== null); // 过滤掉处理失败的项
+            }).filter(item => item !== null); // 过滤掉处理失败的项和已加载的项
         }
         return [];
     } catch (error) {
@@ -164,6 +176,9 @@ const resetDanmuku = () => {
 
     // 清空已加载的时间范围记录
     loadedTimeRanges = [];
+    
+    // 清空已加载的弹幕ID集合
+    loadedDanmuIds.clear();
 
     // 加载初始弹幕
     loadDanmuku(0, 60);
@@ -209,6 +224,9 @@ const initPlayer = () => {
         art.destroy();
         art = null;
     }
+    
+    // 重置弹幕ID集合
+    loadedDanmuIds = new Set();
 
     // 检测是否为移动端设备
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
