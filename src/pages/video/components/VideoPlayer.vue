@@ -24,7 +24,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getVideoPlayAPI, postPlayResourcesAPI } from "@/api/video";
+import CryptoJS from 'crypto-js';
+import { getVideoPlayAPI, getVideoPlayParamsAPI, getVideoPlayAPI2 } from "@/api/video";
 import ArtPlayer from '@/components/art-player/index.vue';
 import { useCommonStore } from '@/stores/commonStore';
 
@@ -91,19 +92,45 @@ const getVideoUrl = async () => {
 
     // 获取播放地址
     // https://v3.douyinvod.com/7436333fa505bb3b481a21f9dc2547c6/67fc9ec7/video/tos/cn/tos-cn-v-6643b4/oUEBUDnM9iOFXlwzDAEM58FzL4SBsgffE12KOS/
-    const res = await getVideoPlayAPI({
+    // const res = await getVideoPlayAPI({
+    const res_params = await getVideoPlayParamsAPI({
       id: props.videoId,
       play: props.playType,
       part: props.part,
     });
 
+    // 发送二次数据获取请求
+    const res_result = await getVideoPlayAPI2(res_params.data.url, {
+      "x-form": res_params.data["x-form"],
+      "x-sign1": res_params.data["x-sign1"],
+      "x-sign2": res_params.data["x-sign2"],
+      "x-time": res_params.data["x-time"]
+    })
+
+    // AES解密数据
+    const key = CryptoJS.enc.Utf8.parse(res_params.data["aes_key"])
+    const iv = CryptoJS.enc.Utf8.parse(res_params.data["aes_iv"])
+    // 假设返回数据在 res.data
+    const decrypted = CryptoJS.AES.decrypt(res_result.data, key, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    })
+    const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8)
+    // decryptedStr 就是解密后的明文数据
+    console.log("decryptedStr:", decryptedStr)
+    let res = JSON.parse(decryptedStr);
+
+    console.log('获取到的播放地址:', res);
+
     // 处理播放类型
     let url;
-    if (res.data.type === "multi") {
-      url = res.data.url.multi[0].url;
-    } else {
-      url = res.data.url.single;
-    }
+    // if (res.data.type === "multi") {
+    //   url = res.data.url.multi[0].url;
+    // } else {
+    //   url = res.data.url.single;
+    // }
+    url = res.url;
     
     playerUrl.value = url;
     
@@ -157,9 +184,9 @@ watch(
 
 onMounted(() => {
   checkH265Support();
-  if (props.videoId && props.part && props.playType) {
-    getVideoUrl();
-  }
+  // if (props.videoId && props.part && props.playType) {
+  //   getVideoUrl();
+  // }
 });
 </script>
 

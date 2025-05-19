@@ -1,5 +1,6 @@
 import request from '@/utils/request';
 import qs from 'query-string'
+import axios from "axios";
 
 
 // 获取频道数据
@@ -39,6 +40,23 @@ export function getVideoPlayAPI(params) {
         paramsSerializer: (params) => {
             return qs.stringify(params)
         },
+    })
+}
+
+// 获取视频播放线路-参数获取
+export function getVideoPlayParamsAPI(params) {
+    return request.get(`video/play/params`, {
+        params,
+        paramsSerializer: (params) => {
+            return qs.stringify(params)
+        },
+    })
+}
+
+// 二次获取播放数据
+export function getVideoPlayAPI2(url, params) {
+    return axios.get(url, {
+        headers: params
     })
 }
 
