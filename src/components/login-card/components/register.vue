@@ -29,13 +29,12 @@
                 </div>
             </div>
 
-            <!-- 手机号/邮箱输入框 -->
+            <!-- 邮箱输入框 -->
             <div class="contact-group">
-                <a-input v-model="registerForm.contact" placeholder="手机号/邮箱"
+                <a-input v-model="registerForm.contact" placeholder="请输入邮箱"
                     @blur="validateContact" :style="{ marginBottom: contactError ? '5px' : '0' }">
                     <template #prefix>
-                        <icon-mobile v-if="!isEmail" />
-                        <icon-email v-else />
+                        <icon-email />
                     </template>
                 </a-input>
                 <a-button type="outline" :disabled="!canSendCode" @click="sendVerificationCode"
@@ -76,7 +75,7 @@
 import { ref, computed } from 'vue';
 import { postRegisterAPI, postUserCaptchaAPI, postUserSmsAPI } from '@/api/user';
 import { Message } from '@arco-design/web-vue';
-import { IconClose, IconUser, IconLock, IconMobile, IconEmail, IconSafe, IconCheckCircle } from '@arco-design/web-vue/es/icon';
+import { IconClose, IconUser, IconLock, IconEmail, IconSafe, IconCheckCircle } from '@arco-design/web-vue/es/icon';
 
 // 验证码相关变量
 const captchaUUID = ref('');
@@ -103,9 +102,9 @@ const loading = ref(false);
 // 定义emit
 const emit = defineEmits(['goLogin', 'closeLoginModal']);
 
-// 是否为邮箱模式
+// 邮箱模式 (始终为true，仅保留以兼容后端API)
 const isEmail = computed(() => {
-    return registerForm.value.contact.includes('@');
+    return true;
 });
 
 // 是否可以发送验证码
@@ -153,7 +152,7 @@ const sendVerificationCode = () => {
         // 将图形验证码转换为数字类型
         dots: registerForm.value.imageCaptcha,
         type: "reg",
-        enum: isEmail.value ? 1 : 0
+        enum: 1 // 固定为邮箱类型
     };
 
     // 发送验证码
@@ -179,22 +178,14 @@ const validateUsername = () => {
 const validateContact = () => {
     const contact = registerForm.value.contact;
     if (!contact) {
-        contactError.value = '手机号/邮箱不能为空';
+        contactError.value = '邮箱不能为空';
         return false;
     }
 
-    if (isEmail.value) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(contact)) {
-            contactError.value = '请输入有效的邮箱地址';
-            return false;
-        }
-    } else {
-        const phoneRegex = /^1[3-9]\d{9}$/;
-        if (!phoneRegex.test(contact)) {
-            contactError.value = '请输入有效的手机号';
-            return false;
-        }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contact)) {
+        contactError.value = '请输入有效的邮箱地址';
+        return false;
     }
 
     contactError.value = '';
@@ -225,12 +216,12 @@ const handleRegister = async () => {
     try {
         // 调用注册接口
         const res = await postRegisterAPI({
-            phone: registerForm.value.contact,
+            phone: "", // 不再使用手机号注册
             email: registerForm.value.contact,
             user_name: registerForm.value.user_name,
             sms_code: registerForm.value.verificationCode,
             password: registerForm.value.password,
-            enum: isEmail.value ? 1 : 0
+            enum: 1 // 固定为邮箱类型
         });
 
         if (res.data.code !== 200) {
