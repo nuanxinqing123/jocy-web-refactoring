@@ -260,12 +260,14 @@ const initPlayer = () => {
     const options = {
         container: artPlayerRef.value,
         url: props.url,
-        volume: 0.5,
+        volume: 0.7,
         autoSize: true,
         autoplay: false,
         pip: !isMobile,
-        autoOrientation: isMobile,
+        autoMini: !isMobile,
+        autoOrientation: isMobile, // todo 移动端自动旋转
         fastForward: isMobile,
+        lock: isMobile,
         fullscreen: true,
         fullscreenWeb: true,
         miniProgressBar: true,
@@ -295,6 +297,7 @@ const initPlayer = () => {
             m3u8: playM3u8,
         },
         plugins: [danmukuPlugin],
+        // quality: []   todo 清晰度/质量切换
     };
 
     // 判断URL中是否包含m3u8
