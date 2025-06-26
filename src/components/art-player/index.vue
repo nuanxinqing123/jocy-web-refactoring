@@ -265,7 +265,6 @@ const initPlayer = () => {
         autoplay: false,
         pip: !isMobile,
         autoMini: !isMobile,
-        autoOrientation: isMobile, // todo 移动端自动旋转
         fastForward: isMobile,
         lock: isMobile,
         fullscreen: true,
