@@ -250,7 +250,7 @@ const initPlayer = () => {
         margin: [10, '25%'], // 弹幕上下边距
         antiOverlap: true, // 防重叠
         useWorker: true, // 使用 web worker
-        synchronousPlayback: false, // 同步播放
+        synchronousPlayback: true, // 同步播放
         filter: function (danmu) {
             return danmu.text.length < 50; // 过滤超长弹幕
         }
