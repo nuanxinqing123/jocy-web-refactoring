@@ -163,22 +163,18 @@ export function getVideoRecommend(id, params) {
 // 添加用户收藏
 export function addVideoCollect(videoId) {
     return request({
-        url: '/user/collect',
+        url: '/collect',
         method: 'post',
-        data: {
-            video_id: videoId
-        }
+        data: videoId
     });
 }
 
 // 删除用户收藏
 export function deleteVideoCollect(videoId) {
     return request({
-        url: '/user/collect',
+        url: '/collect',
         method: 'delete',
-        data: {
-            video_id: videoId
-        }
+        data: videoId
     });
 }
 
