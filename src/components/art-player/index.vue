@@ -27,6 +27,10 @@ const props = defineProps({
     url: {
         type: String,
         required: true
+    },
+    playAddrList: {
+        type: Array,
+        default: () => []
     }
 });
 
@@ -219,6 +223,12 @@ const resetDanmuku = () => {
 
 // 初始化播放器
 const initPlayer = () => {
+    // 检查是否有有效的播放URL
+    if (!props.url || props.url.trim() === '') {
+        console.warn('播放URL为空，跳过播放器初始化');
+        return;
+    }
+
     // 销毁旧的播放器实例
     if (art) {
         art.destroy();
@@ -296,7 +306,15 @@ const initPlayer = () => {
             m3u8: playM3u8,
         },
         plugins: [danmukuPlugin],
-        // quality: []   todo 清晰度/质量切换
+        quality: props.playAddrList && props.playAddrList.length > 0 ? props.playAddrList.map((item, index) => {
+            console.log(item);
+            
+            return { 
+                html: item.desc || item.title || '默认', 
+                url: item.url, 
+                default: index === 0 
+            }
+        }) : []
     };
 
     // 判断URL中是否包含m3u8
@@ -483,20 +501,28 @@ const saveHistoryToServer = (currentTime) => {
 
 // 监听props变化
 watch([() => props.part, () => props.playType, () => props.url], () => {
-    if (art && props.url) {
-        art.switchUrl(props.url);
-        clearTimeTracking();
+    try {
+        if (art && props.url) {
+            art.switchUrl(props.url);
+            clearTimeTracking();
 
-        // 重置弹幕加载机制
-        resetDanmuku();
-    } else {
-        initPlayer();
+            // 重置弹幕加载机制
+            resetDanmuku();
+        } else {
+            initPlayer();
+        }
+    } catch (error) {
+        console.error('播放器更新失败:', error);
     }
 });
 
 onMounted(() => {
-    if (props.url) {
-        initPlayer();
+    try {
+        if (props.url) {
+            initPlayer();
+        }
+    } catch (error) {
+        console.error('播放器初始化失败:', error);
     }
 });
 

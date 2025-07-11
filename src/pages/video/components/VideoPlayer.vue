@@ -6,6 +6,7 @@
       :part="part"
       :play-type="playType"
       :url="playerUrl"
+      :play-addr-list="playAddrList"
       @next-play="handleNextPlay"
     />
     <div v-else class="loading-container">
@@ -14,9 +15,7 @@
     
     <!-- H265不支持提示 -->
     <div v-if="!supportH265 && isH265Video" class="h265-unsupported-tip">
-      <a-alert type="warning" show-icon>
-        <template #message>当前浏览器不支持播放H265视频，请更换其他浏览器或播放设备。</template>
-      </a-alert>
+      <a-alert type="warning" title="当前浏览器不支持播放H265视频，请更换其他浏览器或播放设备。" show-icon />
     </div>
   </div>
 </template>
@@ -25,7 +24,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import CryptoJS from 'crypto-js';
-import { getVideoPlayAPI, getVideoPlayParamsAPI, getVideoPlayAPI2 } from "@/api/video";
+import { getVideoPlayParamsAPI, getVideoPlayAPI2 } from "@/api/video";
 import ArtPlayer from '@/components/art-player/index.vue';
 import { useCommonStore } from '@/stores/commonStore';
 
@@ -48,13 +47,14 @@ const emit = defineEmits(['next-play']);
 const route = useRoute();
 const router = useRouter();
 const playerUrl = ref('');
+const playAddrList = ref([]); // 添加清晰度列表
 const supportH265 = ref(false);
 const isH265Video = ref(false);
 
 // 检测浏览器是否支持H265
 const checkH265Support = () => {
   let mseSupport = false;
-  let elementSupport = false;
+  let elementSupport;
   
   // 检测MediaSource Extensions对HEVC的支持
   if (window.MediaSource) {
@@ -82,6 +82,7 @@ const getVideoUrl = async () => {
   try {
     // 重置播放地址
     playerUrl.value = '';
+    playAddrList.value = []; // 重置清晰度列表
 
     // 此处判断是否登录, 需要强制登录
     const commonStore = useCommonStore();
@@ -90,9 +91,7 @@ const getVideoUrl = async () => {
       return;
     }
 
-    // 获取播放地址
-    // https://v3.douyinvod.com/7436333fa505bb3b481a21f9dc2547c6/67fc9ec7/video/tos/cn/tos-cn-v-6643b4/oUEBUDnM9iOFXlwzDAEM58FzL4SBsgffE12KOS/
-    // const res = await getVideoPlayAPI({
+    // 获取播放地址参数
     const res_params = await getVideoPlayParamsAPI({
       id: props.videoId,
       play: props.playType,
@@ -107,57 +106,77 @@ const getVideoUrl = async () => {
       "x-time": res_params.data["x-time"]
     })
 
-    // AES解密数据
-    const key = CryptoJS.enc.Utf8.parse(res_params.data["aes_key"])
-    const iv = CryptoJS.enc.Utf8.parse(res_params.data["aes_iv"])
-    // 假设返回数据在 res.data
-    const decrypted = CryptoJS.AES.decrypt(res_result.data, key, {
-      iv: iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
-    })
-    const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8)
-    // decryptedStr 就是解密后的明文数据
-    console.log("decryptedStr:", decryptedStr)
-    let res = JSON.parse(decryptedStr);
+    let res;
+    
+    // 尝试解密数据，如果解密失败则说明是明文数据
+    try {
+      const key = CryptoJS.enc.Utf8.parse(res_params.data["aes_key"])
+      const iv = CryptoJS.enc.Utf8.parse(res_params.data["aes_iv"])
+      
+      const decrypted = CryptoJS.AES.decrypt(res_result.data, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      })
+      const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8)
+      
+      // 检查解密后的字符串是否为有效JSON
+      if (decryptedStr && decryptedStr.trim().startsWith('{')) {
+        console.log("解密后的数据:", decryptedStr)
+        res = JSON.parse(decryptedStr);
+      } else {
+        throw new Error('解密后数据格式无效');
+      }
+    } catch (decryptError) {
+      // 解密失败，说明是明文数据
+      console.log("数据解密失败，使用明文数据:", res_result.data)
+      res = res_result.data;
+    }
 
     console.log('获取到的播放地址:', res);
 
-    // 处理播放类型
-    let url;
-    // if (res.data.type === "multi") {
-    //   url = res.data.url.multi[0].url;
-    // } else {
-    //   url = res.data.url.single;
-    // }
-    url = res.url;
-    
-    playerUrl.value = url;
-    
-    // 判断是否为H265视频
-    // 这里假设视频编码信息可以从响应中获取，如果不能，可能需要根据实际情况调整
-    // 例如：根据URL特征或响应中的其他信息来判断
-    isH265Video.value = res.data.codec === 'h265' || 
-                        (res.data.info && res.data.info.indexOf('hevc') > -1) ||
-                        (res.data.info && res.data.info.indexOf('h265') > -1);
-
-    // // 处理m3u8格式
-    // if (url.toString().includes(".m3u8")) {
-    //   // 判断URL地址是否为HTTPS
-    //   if (url.toString().includes("https://")) {
-    //     playerUrl.value = url;
-    //   } else {
-    //     // 需要转换非https的m3u8
-    //     const m3u8Res = await postPlayResourcesAPI(url);
-    //     // string转换为m3u8文件
-    //     const blob = new Blob([m3u8Res.data]);
-    //     // 创建虚拟URL
-    //     playerUrl.value = URL.createObjectURL(blob);
-    //   }
-    // } else {
-    //   // 直接使用非m3u8地址
-    //   playerUrl.value = url;
-    // }
+    // 处理不同格式的返回数据
+    if (res.code === 200 && res.data && res.data.playAddr) {
+      // 新格式：包含多个清晰度的数据
+      const playAddrData = res.data.playAddr;
+      
+      // 构建清晰度列表
+      playAddrList.value = playAddrData.map(item => ({
+        title: item.title || '未知',
+        desc: item.desc || item.title || '默认',
+        url: item.m3u8FileDomain + item.addr,
+        vcodec: item.vcodec,
+        format: item.format
+      }));
+      
+      // 默认选择第一个清晰度
+      if (playAddrList.value.length > 0) {
+        playerUrl.value = playAddrList.value[0].url;
+        
+        // 判断是否为H265视频
+        isH265Video.value = playAddrList.value[0].vcodec === 'H265' || 
+                           playAddrList.value[0].vcodec === 'h265';
+      }
+    } else if (res.url) {
+      // 旧格式：单一播放地址
+      playerUrl.value = res.url;
+      
+      // 构建单一清晰度列表
+      playAddrList.value = [{
+        title: '标清',
+        desc: '默认',
+        url: res.url,
+        vcodec: res.data?.codec || 'H264',
+        format: 'MP4'
+      }];
+      
+      // 判断是否为H265视频
+      isH265Video.value = res.data?.codec === 'h265' || 
+                         (res.data?.info && res.data.info.indexOf('hevc') > -1) ||
+                         (res.data?.info && res.data.info.indexOf('h265') > -1);
+    } else {
+      console.error('无法解析播放地址数据格式');
+    }
   } catch (error) {
     console.error('获取视频播放地址失败:', error);
   }
@@ -184,9 +203,6 @@ watch(
 
 onMounted(() => {
   checkH265Support();
-  // if (props.videoId && props.part && props.playType) {
-  //   getVideoUrl();
-  // }
 });
 </script>
 
