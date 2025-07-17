@@ -2,7 +2,7 @@ import axios from 'axios'
 import CryptoJS from 'crypto-js';
 import { useCommonStore } from '@/stores/commonStore';
 
-export const baseURL = 'https://jocy-api.6b7.xyz/app/';
+export const baseURL = 'https://修改为自己的开发/部署地址/app/';
 
 // 创建axios实例
 const instance = axios.create({
